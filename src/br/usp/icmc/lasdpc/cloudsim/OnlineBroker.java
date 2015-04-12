@@ -1,14 +1,16 @@
 package br.usp.icmc.lasdpc.cloudsim;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.cloudbus.cloudsim.DatacenterBroker;
+import org.cloudbus.cloudsim.DatacenterCharacteristics;
 import org.cloudbus.cloudsim.Log;
 import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.core.CloudSimTags;
-import org.cloudbus.cloudsim.core.SimEntity;
 import org.cloudbus.cloudsim.core.SimEvent;
 
-public class OnlineBroker extends SimEntity {
+public class OnlineBroker extends DatacenterBroker {
 	
 	/** Sample time to monitoring, processing and afterwards effecting */
 	private int sampleTime;
@@ -43,6 +45,7 @@ public class OnlineBroker extends SimEntity {
 
 	@Override
 	public void startEntity() {
+		super.startEntity();
 		sendNow(getId(), SAMPLE_TIME);
 	}
 
@@ -56,16 +59,25 @@ public class OnlineBroker extends SimEntity {
 		case CloudSimTags.END_OF_SIMULATION:
 				done();
 			break;
-
+			
+		case CloudSimTags.RESOURCE_CHARACTERISTICS:
+				processResourceCharacteristics(ev);
+			break;
+			
 		default:
-				Log.printConcatLine("Ouch... event tag not found.");
+				super.processEvent(ev);
 			break;
 		}
 	}
 
 	@Override
-	public void shutdownEntity() {
-		Log.printConcatLine(CloudSim.clock() + ": " + getName() + " shut down.");
+	protected void processResourceCharacteristics(SimEvent ev) {
+		DatacenterCharacteristics characteristics = (DatacenterCharacteristics) ev.getData();
+		getDatacenterCharacteristicsList().put(characteristics.getId(), characteristics);
+
+		if (getDatacenterCharacteristicsList().size() == getDatacenterIdsList().size()) {
+			setDatacenterRequestedIdsList(new ArrayList<Integer>());
+		}
 	}
 
 	private void done() {
@@ -75,12 +87,7 @@ public class OnlineBroker extends SimEntity {
 	}
 	
 	private void processSample(SimEvent ev) {
-		// process...
-		List<Double> values = monitor.get();
-		System.out.println(values.get(0) + " Sample time is ticking...");
-		effector.set(capacity.update(values), demand.update(values));
-		
-		// schedule the next sample time event.
+		effector.set(capacity.update(monitor.get()), demand.update(monitor.get()));
 		send(getId(), sampleTime, SAMPLE_TIME);
 	}
 	
