@@ -12,22 +12,37 @@ import org.cloudbus.cloudsim.core.SimEvent;
 
 public class OnlineBroker extends DatacenterBroker {
 	
-	/** Sample time to monitoring, processing and afterwards effecting */
+	/** 
+	 * Sample time to monitoring, processing and afterwards effecting 
+	 */
 	private int sampleTime;
 	
-	/** Unique identification (tag) for Sample events. */
+	/** 
+	 * Unique identification (tag) for Sample events. 
+	 */
 	private static final int SAMPLE_TIME = 80801;
 	
-	/** Monitor class, its responsibility is get information about the system */
+	/** 
+	 * Monitor class, its responsibility is get information about the system 
+	 */
 	private Monitor monitor;
 	
-	/** Effector class, its responsibility is set demand and capacity against/of the systems */
+	/** 
+	 * Effector class, its responsibility is set demand and capacity 
+	 * against/of the systems 
+	 */
 	private Effector effector;
 	
-	/** Capacity class, its responsibility is generate a list of events about the amount of VMs in the system  */
+	/** 
+	 * Capacity class, its responsibility is generate a list of events about 
+	 * the amount of VMs in the system  
+	 */
 	private Capacity capacity;
 	
-	/** Demand class, its responsibility is generate a list of events about the tasks to be imposed in the system */
+	/** 
+	 * Demand class, its responsibility is generate a list of events about 
+	 * the tasks to be imposed in the system 
+	 */
 	private Demand demand;
 	
 	
@@ -83,6 +98,7 @@ public class OnlineBroker extends DatacenterBroker {
 	private void done() {
 		Log.printConcatLine("Ending " + getName() + " at CloudSim.Clock(): " 
 				+ CloudSim.clock());
+		// TODO: will it always work?
 		setState(FINISHED);
 	}
 	
