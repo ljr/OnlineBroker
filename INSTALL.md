@@ -13,3 +13,5 @@ Installation notes for Eclipse:
 * Install CloudSim as a Maven Project
 
 * Install OnlineBroker as a Maven Project
+
+Reference: (CloudSimEx)[https://github.com/Cloudslab/CloudSimEx/wiki/Installation]
