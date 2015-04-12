@@ -4,7 +4,7 @@ import java.util.Calendar;
 
 import org.cloudbus.cloudsim.core.CloudSim;
 
-import br.usp.icmc.lasdpc.cloudsim.OnlineBroker2;
+import br.usp.icmc.lasdpc.cloudsim.OnlineBroker;
 
 public class SimulatorExample1 {
 
@@ -16,7 +16,7 @@ public class SimulatorExample1 {
 
 		
 		int sampleTime = 10;
-		new OnlineBroker2("mybroker", sampleTime, new MyMonitor(), 
+		new OnlineBroker("mybroker", sampleTime, new MyMonitor(), 
 				new MyEffector(), new MyCapacity(), new MyDemand());
 		
 		

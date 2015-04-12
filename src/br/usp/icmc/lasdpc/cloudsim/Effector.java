@@ -8,7 +8,7 @@ import org.cloudbus.cloudsim.core.SimEntity;
 
 public abstract class Effector {
 	
-	protected OnlineBroker2 mybroker;
+	protected OnlineBroker mybroker;
 	protected List<Event> cap;
 	protected List<Event> dem;
 
@@ -28,7 +28,7 @@ public abstract class Effector {
 		return mybroker;
 	}
 
-	public void setMybroker(OnlineBroker2 mybroker) {
+	public void setMybroker(OnlineBroker mybroker) {
 		this.mybroker = mybroker;
 	}
 	
