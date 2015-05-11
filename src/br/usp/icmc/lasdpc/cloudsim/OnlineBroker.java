@@ -1,15 +1,14 @@
 package br.usp.icmc.lasdpc.cloudsim;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.cloudbus.cloudsim.DatacenterBroker;
-import org.cloudbus.cloudsim.DatacenterCharacteristics;
 import org.cloudbus.cloudsim.Log;
 import org.cloudbus.cloudsim.core.CloudSim;
+import org.cloudbus.cloudsim.core.CloudSimTags;
+import org.cloudbus.cloudsim.core.SimEntity;
 import org.cloudbus.cloudsim.core.SimEvent;
 
-public class OnlineBroker extends DatacenterBroker {
+public class OnlineBroker extends SimEntity {
 	
 	/** 
 	 * Sample time to monitoring, processing and afterwards effecting 
@@ -59,30 +58,23 @@ public class OnlineBroker extends DatacenterBroker {
 
 	@Override
 	public void startEntity() {
-		super.startEntity();
 		sendNow(getId(), SAMPLE_TIME);
 	}
 
 	@Override
-	protected void processOtherEvent(SimEvent ev) {
+	public void processEvent(SimEvent ev) {
 		switch (ev.getTag()) {
 		case SAMPLE_TIME:
 				processSample(ev);
+			break;
+		
+		case CloudSimTags.END_OF_SIMULATION:
+				shutdownEntity();
 			break;
 			
 		default:
 				Log.print("Nothing to do here...");
 			break;
-		}
-	}
-
-	@Override
-	protected void processResourceCharacteristics(SimEvent ev) {
-		DatacenterCharacteristics characteristics = (DatacenterCharacteristics) ev.getData();
-		getDatacenterCharacteristicsList().put(characteristics.getId(), characteristics);
-
-		if (getDatacenterCharacteristicsList().size() == getDatacenterIdsList().size()) {
-			setDatacenterRequestedIdsList(new ArrayList<Integer>());
 		}
 	}
 
@@ -111,4 +103,5 @@ public class OnlineBroker extends DatacenterBroker {
 			send(id, e.getDelay(), e.getTag(), e.getData());
 		}
 	}
+
 }
