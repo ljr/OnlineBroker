@@ -9,6 +9,7 @@ import org.cloudbus.cloudsim.core.SimEntity;
 public abstract class Effector {
 	
 	protected OnlineBroker mybroker;
+	protected Monitor monitor;
 	protected List<Event> cap;
 	protected List<Event> dem;
 
@@ -30,6 +31,10 @@ public abstract class Effector {
 
 	public void setMybroker(OnlineBroker mybroker) {
 		this.mybroker = mybroker;
+	}
+	
+	public void setMonitor(Monitor monitor) {
+		this.monitor = monitor;
 	}
 	
 }

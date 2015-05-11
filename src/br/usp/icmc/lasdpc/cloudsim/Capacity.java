@@ -1,9 +1,17 @@
 package br.usp.icmc.lasdpc.cloudsim;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public abstract class Capacity {
 	
-	public abstract List<Event> update(List<Double> values);
+	protected List<Integer> vmIds;
+	
+	public Capacity() {
+		vmIds = new ArrayList<Integer>();
+	}
+	
+	public abstract List<Event> update(Map<MonitorTypes, List<Object>> values);
 
 }

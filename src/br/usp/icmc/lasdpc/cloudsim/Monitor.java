@@ -1,30 +1,44 @@
 package br.usp.icmc.lasdpc.cloudsim;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.cloudbus.cloudsim.core.CloudSim;
 
+
 public abstract class Monitor {
 	
-	List<Double> current;
+	protected Map<MonitorTypes, List<Object>> values;
 	
-	public List<Double> getCurrent() {
-		return current;
+	public Map<MonitorTypes, List<Object>> getValues() {
+		return values;
+	}
+
+	public boolean isNull(MonitorTypes key) {
+		return values.get(key) == null;
+	}
+	
+	public void add(MonitorTypes key, Object value) {
+		if (isNull(key)) {
+			values.put(key, new ArrayList<Object>());
+		}
+		
+		values.get(key).add(value);
 	}
 
 	public Monitor() {
-		current = new ArrayList<Double>();
+		values = new HashMap<MonitorTypes, List<Object>>();
 	}
 	
 	protected void sample() {
-		current.clear();
-		current.add(CloudSim.clock());
+		add(MonitorTypes.DOUBLE, CloudSim.clock());
 	}
 
-	public List<Double> get() {
+	public Map<MonitorTypes, List<Object>> get() {
 		sample();
-		return getCurrent();
+		return values;
 	}
-	
+
 }

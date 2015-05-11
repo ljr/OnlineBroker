@@ -22,7 +22,7 @@ import br.usp.icmc.lasdpc.cloudsim.OnlineBroker;
 public class SimulatorExample1 {
 
 	public static void main(String[] args) throws Exception {
-
+		
 		
 		 /*
 		  * CLOUDSIM REQUIRED INITIALIZATION
