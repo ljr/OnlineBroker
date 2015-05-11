@@ -65,22 +65,14 @@ public class OnlineBroker extends DatacenterBroker {
 	}
 
 	@Override
-	public void processEvent(SimEvent ev) {
+	protected void processOtherEvent(SimEvent ev) {
 		switch (ev.getTag()) {
 		case SAMPLE_TIME:
 				processSample(ev);
 			break;
 			
-		case CloudSimTags.END_OF_SIMULATION:
-				done();
-			break;
-			
-		case CloudSimTags.RESOURCE_CHARACTERISTICS:
-				processResourceCharacteristics(ev);
-			break;
-			
 		default:
-				super.processEvent(ev);
+				Log.print("Nothing to do here...");
 			break;
 		}
 	}
@@ -95,7 +87,8 @@ public class OnlineBroker extends DatacenterBroker {
 		}
 	}
 
-	private void done() {
+	@Override
+	public void shutdownEntity() {
 		Log.printConcatLine("Ending " + getName() + " at CloudSim.Clock(): " 
 				+ CloudSim.clock());
 		// TODO: will it always work?
@@ -103,7 +96,11 @@ public class OnlineBroker extends DatacenterBroker {
 	}
 	
 	private void processSample(SimEvent ev) {
-		effector.set(capacity.update(monitor.get()), demand.update(monitor.get()));
+		effector.set(
+				capacity.update(monitor.get()), 
+				demand.update(monitor.get())
+		);
+		
 		send(getId(), sampleTime, SAMPLE_TIME);
 	}
 	
