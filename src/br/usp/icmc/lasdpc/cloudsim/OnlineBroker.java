@@ -59,6 +59,7 @@ public class OnlineBroker extends SimEntity {
 	@Override
 	public void startEntity() {
 		sendNow(getId(), SAMPLE_TIME);
+		Log.printConcatLine(getName(), " it started.");		
 	}
 
 	@Override
@@ -80,14 +81,12 @@ public class OnlineBroker extends SimEntity {
 
 	@Override
 	public void shutdownEntity() {
-		Log.printConcatLine("Ending " + getName() + " at CloudSim.Clock(): " 
-				+ CloudSim.clock());
+		Log.printConcatLine("Ending ", getName(), " at CloudSim.Clock(): ", CloudSim.clock());
 		// TODO: will it always work?
 		setState(FINISHED);
 	}
 	
 	private void processSample(SimEvent ev) {
-		Log.printConcat("#", 1, " sample\n");
 		effector.set(
 				capacity.update(monitor.get()), 
 				demand.update(monitor.get())
