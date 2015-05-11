@@ -80,10 +80,6 @@ public class OnlineBroker extends DatacenterBroker {
 	protected void processResourceCharacteristics(SimEvent ev) {
 		DatacenterCharacteristics characteristics = (DatacenterCharacteristics) ev.getData();
 		getDatacenterCharacteristicsList().put(characteristics.getId(), characteristics);
-
-		if (getDatacenterCharacteristicsList().size() == getDatacenterIdsList().size()) {
-			setDatacenterRequestedIdsList(new ArrayList<Integer>());
-		}
 	}
 
 	@Override
