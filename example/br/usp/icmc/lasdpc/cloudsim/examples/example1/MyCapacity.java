@@ -9,7 +9,6 @@ public class MyCapacity extends Capacity {
 
 	@Override
 	public List<Event> update(List<Double> values) {
-		System.out.println("MyCapacity.update() invoked.");
 		return null;
 	}
 

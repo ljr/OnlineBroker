@@ -7,7 +7,6 @@ import org.cloudbus.cloudsim.DatacenterBroker;
 import org.cloudbus.cloudsim.DatacenterCharacteristics;
 import org.cloudbus.cloudsim.Log;
 import org.cloudbus.cloudsim.core.CloudSim;
-import org.cloudbus.cloudsim.core.CloudSimTags;
 import org.cloudbus.cloudsim.core.SimEvent;
 
 public class OnlineBroker extends DatacenterBroker {
@@ -96,6 +95,7 @@ public class OnlineBroker extends DatacenterBroker {
 	}
 	
 	private void processSample(SimEvent ev) {
+		Log.printConcat("#", 1, " sample\n");
 		effector.set(
 				capacity.update(monitor.get()), 
 				demand.update(monitor.get())
@@ -105,8 +105,10 @@ public class OnlineBroker extends DatacenterBroker {
 	}
 	
 	public void sendEvents(List<Event> events) {
+		int id;
 		for (Event e : events) {
-			send(getId(), e.getDelay(), e.getTag(), e.getData());
+			id = e.getDest() == -1 ? getId() : e.getDest();
+			send(id, e.getDelay(), e.getTag(), e.getData());
 		}
 	}
 }

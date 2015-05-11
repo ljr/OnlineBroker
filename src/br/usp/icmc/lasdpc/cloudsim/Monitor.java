@@ -14,13 +14,10 @@ public abstract class Monitor {
 	}
 
 	public Monitor() {
-		System.out.println("monitor created;");
 		current = new ArrayList<Double>();
 	}
 	
 	protected void sample() {
-		System.out.println("Monitor.sample() invoked.");
-
 		current.clear();
 		current.add(CloudSim.clock());
 	}

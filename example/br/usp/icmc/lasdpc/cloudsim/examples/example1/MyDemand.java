@@ -11,7 +11,6 @@ public class MyDemand extends Demand {
 
 	@Override
 	public List<Event> update(List<Double> values) {
-		System.out.println("MyDemand.update() invoked.");
 		
 		// TODO: always clear events before calling it.
 		events.clear();

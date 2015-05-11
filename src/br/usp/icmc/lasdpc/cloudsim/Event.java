@@ -17,6 +17,10 @@ public class Event {
 		this(-1, delay, tag, data);
 	}
 	
+	public Event(int dest, double delay, int tag) {
+		this(dest, delay, tag, null);
+	}
+	
 	public Event(double delay, int tag) {
 		this(-1, delay, tag, null);
 	}

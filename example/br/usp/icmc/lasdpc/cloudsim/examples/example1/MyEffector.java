@@ -10,7 +10,6 @@ public class MyEffector extends Effector {
 	
 	@Override
 	public void set(List<Event> cap, List<Event> dem) {
-		System.out.println("MyEffector.set() invoked.");
 		
 		// TODO: always clear before processing
 		clear();

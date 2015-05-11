@@ -43,7 +43,7 @@ public class SimulatorExample1 {
 		 * CRATE A BROKER
 		 */
 		int sampleTime = 10;
-		new OnlineBroker("mybroker", sampleTime, new MyMonitor(), 
+		new OnlineBroker("OnlineBroker", sampleTime, new MyMonitor(), 
 				new MyEffector(), new MyCapacity(), new MyDemand());
 		
 		
