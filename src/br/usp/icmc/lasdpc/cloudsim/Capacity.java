@@ -12,6 +12,6 @@ public abstract class Capacity {
 		vmIds = new ArrayList<Integer>();
 	}
 	
-	public abstract List<Event> update(Map<MonitorTypes, List<Object>> values);
+	public abstract List<Event> update(Map<Integer, List<Object>> values);
 
 }

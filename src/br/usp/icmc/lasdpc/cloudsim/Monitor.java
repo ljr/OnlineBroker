@@ -6,21 +6,22 @@ import java.util.List;
 import java.util.Map;
 
 import org.cloudbus.cloudsim.core.CloudSim;
+import org.cloudbus.cloudsim.core.CloudSimTags;
 
 
 public abstract class Monitor {
 	
-	protected Map<MonitorTypes, List<Object>> values;
+	protected Map<Integer, List<Object>> values;
 	
-	public Map<MonitorTypes, List<Object>> getValues() {
+	public Map<Integer, List<Object>> getValues() {
 		return values;
 	}
 
-	public boolean isNull(MonitorTypes key) {
+	public boolean isNull(int key) {
 		return values.get(key) == null;
 	}
 	
-	public void add(MonitorTypes key, Object value) {
+	public void add(int key, Object value) {
 		if (isNull(key)) {
 			values.put(key, new ArrayList<Object>());
 		}
@@ -29,16 +30,20 @@ public abstract class Monitor {
 	}
 
 	public Monitor() {
-		values = new HashMap<MonitorTypes, List<Object>>();
+		values = new HashMap<Integer, List<Object>>();
 	}
 	
 	protected void sample() {
-		add(MonitorTypes.DOUBLE, CloudSim.clock());
+		add(CloudSimTags.EXPERIMENT, CloudSim.clock());
 	}
 
-	public Map<MonitorTypes, List<Object>> get() {
+	public Map<Integer, List<Object>> get() {
 		sample();
 		return values;
+	}
+	
+	public void clear() {
+		values.clear();
 	}
 
 }

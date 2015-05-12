@@ -21,16 +21,17 @@ import br.usp.icmc.lasdpc.cloudsim.OnlineBroker;
 
 public class SimulatorExample1 {
 
+	private static final int NUM_USER = 1; // number of cloud users
+	
 	public static void main(String[] args) throws Exception {
 		
 		
 		 /*
 		  * CLOUDSIM REQUIRED INITIALIZATION
 		  */
-		int num_user = 1; // number of cloud users
 		Calendar calendar = Calendar.getInstance(); // Calendar whose fields have been initialized with the current date and time.
 		boolean trace_flag = false; // trace events
-		CloudSim.init(num_user, calendar, trace_flag);
+		CloudSim.init(NUM_USER, calendar, trace_flag);
 
 		
 		/*

@@ -7,19 +7,18 @@ import org.cloudbus.cloudsim.core.CloudSimTags;
 
 import br.usp.icmc.lasdpc.cloudsim.Demand;
 import br.usp.icmc.lasdpc.cloudsim.Event;
-import br.usp.icmc.lasdpc.cloudsim.MonitorTypes;
 
 public class MyDemand extends Demand {
 
 	@Override
-	public List<Event> update(Map<MonitorTypes, List<Object>> values) {
+	public List<Event> update(Map<Integer, List<Object>> values) {
 		
 		// TODO: always clear events before calling it.
 		events.clear();
 		
-		for (MonitorTypes k : values.keySet()) {
+		for (Integer k : values.keySet()) {
 			switch (k) {
-			case DOUBLE:
+			case CloudSimTags.EXPERIMENT:
 				if ((Double) values.get(k).get(0) == 100) {
 					events.add(new Event(10, CloudSimTags.END_OF_SIMULATION));
 					System.out.println("end"); System.exit(0);
