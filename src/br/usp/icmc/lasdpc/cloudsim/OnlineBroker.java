@@ -65,6 +65,7 @@ public class OnlineBroker extends SimEntity {
 		this.sampleTime = sampleTime;
 		this.monitor = monitor;
 		this.capacity = capacity;
+		this.capacity.setMyBroker(this);
 		this.effector = effector;
 		this.effector.setMybroker(this);
 		this.demand = demand;
@@ -122,7 +123,10 @@ public class OnlineBroker extends SimEntity {
 
 	private void processVmCreate(SimEvent ev) {
 		int[] data = (int[]) ev.getData();
-		monitor.add(CloudSimTags.VM_CREATE_ACK, new VMAck(data[0], data[1], data[2]));
+		// data[0]: datacenter.id
+		// data[1]: vm.id
+		// data[2]: success?
+		monitor.add(ev.getTag(), new VMAck(data[0], data[1], data[2]));
 	}
 
 

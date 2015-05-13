@@ -3,8 +3,6 @@ package br.usp.icmc.lasdpc.cloudsim;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.cloudbus.cloudsim.core.SimEntity;
-
 
 public abstract class Effector {
 	
@@ -24,7 +22,7 @@ public abstract class Effector {
 		dem.clear();
 	}
 	
-	public SimEntity getMybroker() {
+	public OnlineBroker getMybroker() {
 		return mybroker;
 	}
 

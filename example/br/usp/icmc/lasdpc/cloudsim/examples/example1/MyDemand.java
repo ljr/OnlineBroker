@@ -21,19 +21,15 @@ public class MyDemand extends Demand {
 			case CloudSimTags.EXPERIMENT:
 				if ((Double) values.get(k).get(0) == 100) {
 					events.add(new Event(10, CloudSimTags.END_OF_SIMULATION));
-					System.out.println("end"); System.exit(0);
 				}
 				break;
 
 			default:
+				
 				break;
 			}
 		}
-		/*
-		if ((int) values.get(0) == 100) {
-			events.add(new Event(10, CloudSimTags.END_OF_SIMULATION));
-		}
-		*/
+
 		return events;
 	}
 

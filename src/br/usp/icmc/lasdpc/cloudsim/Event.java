@@ -24,7 +24,15 @@ public class Event {
 	public Event(double delay, int tag) {
 		this(-1, delay, tag, null);
 	}
-
+	
+	public Event(int dest, int tag, Object data) {
+		this(dest, 0, tag, data);
+	}
+	
+	public Event(int dest, int tag) {
+		this(dest, 0, tag, null);
+	}
+	
 	public int getDest() {
 		return dest;
 	}
