@@ -13,22 +13,12 @@
 
   <dependencies>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
       <groupId>org.cloudbus.cloudsim</groupId>
       <artifactId>cloudsim</artifactId>
       <version>3.1-SNAPSHOT</version>
       <scope>system</scope>
       <systemPath>/home/ljr/workspace/cloudsim-package/modules/cloudsim/target/cloudsim-3.1-SNAPSHOT.jar</systemPath>
     </dependency>
-
-
-
   </dependencies>
 
 </project>
