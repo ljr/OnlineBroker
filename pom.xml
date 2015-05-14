@@ -2,21 +2,15 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
+
   <groupId>br.usp.icmc.lasdpc.cloudsim</groupId>
   <artifactId>OnlineBroker</artifactId>
-  <packaging>jar</packaging>
   <version>1.0-SNAPSHOT</version>
-  <name>OnlineBroker</name>
-  <url>http://github.com/ljr/OnlineBroker/</url>
+  <packaging>pom</packaging>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.cloudbus.cloudsim</groupId>
-      <artifactId>cloudsim</artifactId>
-      <version>3.1-SNAPSHOT</version>
-      <scope>system</scope>
-      <systemPath>/home/ljr/workspace/cloudsim-package/modules/cloudsim/target/cloudsim-3.1-SNAPSHOT.jar</systemPath>
-    </dependency>
-  </dependencies>
+  <modules>
+    <module>broker</module>
+    <module>examples</module>
+  </modules>
 
 </project>
