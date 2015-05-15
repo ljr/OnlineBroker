@@ -13,4 +13,14 @@
     <module>examples</module>
   </modules>
 
+  <dependencies>
+    <dependency>
+      <groupId>org.cloudbus.cloudsim</groupId>
+      <artifactId>cloudsim</artifactId>
+      <version>3.1-SNAPSHOT</version>
+      <scope>system</scope>
+      <systemPath>/home/ljr/workspace/cloudsim-package/modules/cloudsim/target/cloudsim-3.1-SNAPSHOT.jar</systemPath>
+    </dependency>
+  </dependencies>
+
 </project>
