@@ -76,9 +76,12 @@ public class OnlineBroker extends SimEntity {
 
 	@Override
 	public void startEntity() {
-		sendNow(getId(), SAMPLE_TIME);
+		send(getId(), sampleTime, SAMPLE_TIME);
+		//sendNow(getId(), SAMPLE_TIME);
 		sendNow(getId(), CloudSimTags.RESOURCE_CHARACTERISTICS_REQUEST);
-		Log.printConcatLine(getName(), " it started.");		
+		Log.printConcatLine("****************************************\n\t", 
+				getName(), 
+				" it started. \n****************************************");		
 	}
 	
 
@@ -98,7 +101,8 @@ public class OnlineBroker extends SimEntity {
 			break;
 			
 		case CloudSimTags.VM_CREATE_ACK:
-				processVmCreate(ev);
+		case CloudSimTags.VM_DESTROY_ACK:
+				processVmAck(ev);
 			break;
 			
 		case CloudSimTags.CLOUDLET_RETURN:
@@ -121,13 +125,14 @@ public class OnlineBroker extends SimEntity {
 	}
 
 
-	private void processVmCreate(SimEvent ev) {
+	private void processVmAck(SimEvent ev) {
 		int[] data = (int[]) ev.getData();
 		// data[0]: datacenter.id
 		// data[1]: vm.id
 		// data[2]: success?
 		monitor.add(ev.getTag(), new VMAck(data[0], data[1], data[2]));
 	}
+
 
 
 	protected void getCharacteristic(SimEvent ev) {
@@ -168,6 +173,9 @@ public class OnlineBroker extends SimEntity {
 		int id;
 		for (Event e : events) {
 			id = e.getDest() == -1 ? getId() : e.getDest();
+			Log.printConcatLine(CloudSim.clock(), ": [EVENT] {dest: ", id,
+					", delay: ", e.getDelay(), ", tag : ", e.getTag(),
+					", data: ", e.getData(), "}");
 			send(id, e.getDelay(), e.getTag(), e.getData());
 		}
 	}

@@ -6,6 +6,7 @@ import java.util.Map;
 import org.cloudbus.cloudsim.CloudletSchedulerTimeShared;
 import org.cloudbus.cloudsim.Log;
 import org.cloudbus.cloudsim.Vm;
+import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.core.CloudSimTags;
 
 import br.usp.icmc.lasdpc.cloudsim.Capacity;
@@ -20,36 +21,52 @@ public class MyCapacity extends Capacity {
 		
 		// TODO: always clear events before calling it.
 		events.clear();
-		
+				
 		for (int k : values.keySet()) {
 			switch (k) {
 			case CloudSimTags.EXPERIMENT:
-					if ((Double) values.get(k).get(0) == 20) { // create after initialization at simulation time zero.
+					double clock = (double) values.get(k).get(0);
+					if (clock == 10) { // create after initialization at simulation time zero.
+						Vm vm = createVM();
+						create(vm);
 						events.add(new Event(chooseDataCenter(), 
-								CloudSimTags.VM_CREATE_ACK, createVM()));
+								CloudSimTags.VM_CREATE_ACK, vm));
+					} else if (clock == 40) {
+						for (int vm : vms.keySet()) {
+							events.add(new Event(getDatacenter(vm), 
+									CloudSimTags.VM_DESTROY, 
+									getVm(vm))); // TODO: INSPECT ME!
+						}
 					}
 				break;
 
 			case CloudSimTags.VM_CREATE_ACK:
+			case CloudSimTags.VM_DESTROY_ACK:
 					for (Object v : values.get(k)) {
 						VMAck va = (VMAck) v;
 						if (va.getSuccess() == CloudSimTags.TRUE) {
-							Log.printConcatLine("[SUCCESS] VM successfully created.",
+							Log.printConcatLine(CloudSim.clock(), ": [SUCCESS] VM ACK received.",
 									" VM id: ", va.getVmId(), 
 									" Datacenter id: ", va.getDatacenterId());
+							setVMDatacenter(va.getVmId(), 
+									k == CloudSimTags.VM_CREATE_ACK
+											? va.getDatacenterId()
+											: null);
 						} else {
 							Log.printConcatLine("[FAILED] during VM creation.",
 									" VM id: ", va.getVmId(), 
 									" Datacenter id: ", va.getDatacenterId());
 						}
 					}
-				
+					
+				break;
+			
 			default:
 				break;
 			}
 		}
 		
-		return null;
+		return events;
 	}
 	
 	private int chooseDataCenter() {

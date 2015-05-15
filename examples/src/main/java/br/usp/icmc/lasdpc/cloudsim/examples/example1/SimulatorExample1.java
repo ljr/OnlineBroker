@@ -72,7 +72,7 @@ public class SimulatorExample1 {
 		peList.add(new Pe(0, new PeProvisionerSimple(mips)));
 
 		int hostId = 0;
-		int ram = 2048; // host memory (MB)
+		int ram = 20480; // host memory (MB)
 		long storage = 1000000; // host storage
 		int bw = 10000;
 

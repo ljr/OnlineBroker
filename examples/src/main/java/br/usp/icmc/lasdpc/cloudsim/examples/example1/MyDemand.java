@@ -20,6 +20,8 @@ public class MyDemand extends Demand {
 			switch (k) {
 			case CloudSimTags.EXPERIMENT:
 				if ((Double) values.get(k).get(0) == 100) {
+					
+					System.out.println("End of simulatin triggered. Cloudsim.clock() = " + (Double) values.get(k).get(0));
 					events.add(new Event(10, CloudSimTags.END_OF_SIMULATION));
 				}
 				break;
