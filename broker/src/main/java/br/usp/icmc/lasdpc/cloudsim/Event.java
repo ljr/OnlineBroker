@@ -65,4 +65,10 @@ public class Event {
 		this.data = data;
 	}
 
+	@Override
+	public String toString() {
+		return "[EVENT] {dest: " + dest + ", delay: " + delay + ", tag: " + tag + 
+				", data: " + data + "}";
+	}
+	
 }

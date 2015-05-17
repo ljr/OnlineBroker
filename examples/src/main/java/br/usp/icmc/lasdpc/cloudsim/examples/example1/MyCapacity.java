@@ -25,40 +25,16 @@ public class MyCapacity extends Capacity {
 		for (int k : values.keySet()) {
 			switch (k) {
 			case CloudSimTags.EXPERIMENT:
-					double clock = (double) values.get(k).get(0);
-					if (clock == 10) { // create after initialization at simulation time zero.
-						Vm vm = createVM();
-						create(vm);
-						events.add(new Event(chooseDataCenter(), 
-								CloudSimTags.VM_CREATE_ACK, vm));
-					} else if (clock == 40) {
-						for (int vm : vms.keySet()) {
-							events.add(new Event(getDatacenter(vm), 
-									CloudSimTags.VM_DESTROY, 
-									getVm(vm))); // TODO: INSPECT ME!
-						}
-					}
+				
+				setCapacity((double) values.get(k).get(0));
+				
 				break;
 
 			case CloudSimTags.VM_CREATE_ACK:
 			case CloudSimTags.VM_DESTROY_ACK:
-					for (Object v : values.get(k)) {
-						VMAck va = (VMAck) v;
-						if (va.getSuccess() == CloudSimTags.TRUE) {
-							Log.printConcatLine(CloudSim.clock(), ": [SUCCESS] VM ACK received.",
-									" VM id: ", va.getVmId(), 
-									" Datacenter id: ", va.getDatacenterId());
-							setVMDatacenter(va.getVmId(), 
-									k == CloudSimTags.VM_CREATE_ACK
-											? va.getDatacenterId()
-											: null);
-						} else {
-							Log.printConcatLine("[FAILED] during VM creation.",
-									" VM id: ", va.getVmId(), 
-									" Datacenter id: ", va.getDatacenterId());
-						}
-					}
-					
+				
+				processVmAck(values.get(k), k == CloudSimTags.VM_CREATE_ACK);
+				
 				break;
 			
 			default:
@@ -69,11 +45,44 @@ public class MyCapacity extends Capacity {
 		return events;
 	}
 	
+	private void setCapacity(double clock) {
+		if (clock == 10) { 
+			createVM();
+		} else if (clock == 40) {
+			destroyVM();
+		}
+	}
+
+	private void processVmAck(List<Object> acks, boolean isCreate) {
+		for (Object v : acks) {
+			VMAck va = (VMAck) v;
+			Log.printConcatLine(CloudSim.clock(), ": ", va);
+			
+			if (va.getSuccess() == CloudSimTags.TRUE) {
+				setVMDatacenter(va.getVmId(), 
+						isCreate ? va.getDatacenterId() : null);
+			}
+		}		
+	}
+
+	private void destroyVM() {
+		for (int vm : vms.keySet()) {
+			events.add(new Event(getDatacenter(vm), 
+					CloudSimTags.VM_DESTROY_ACK, getVm(vm)));
+		}		
+	}
+
+	private void createVM() {
+		Vm vm = newVm(); 
+		create(vm);
+		events.add(new Event(chooseDataCenter(), CloudSimTags.VM_CREATE_ACK, vm));
+	}
+
 	private int chooseDataCenter() {
 		return mybroker.getDcs().get(0);
 	}
 
-	private Vm createVM() {
+	private Vm newVm() {
 		// VM description
 		int vmid = 0;
 		int mips = 1000;
@@ -84,9 +93,8 @@ public class MyCapacity extends Capacity {
 		String vmm = "Xen"; // VMM name
 
 		// create VM
-		return new Vm(vmid, mybroker.getId(), mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerTimeShared());
+		return new Vm(vmid, mybroker.getId(), mips, pesNumber, ram, bw, size, 
+				vmm, new CloudletSchedulerTimeShared());
 	}
-
-
 
 }

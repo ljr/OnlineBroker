@@ -2,6 +2,9 @@ package br.usp.icmc.lasdpc.cloudsim.examples.example1;
 
 import java.util.List;
 
+import org.cloudbus.cloudsim.core.CloudSim;
+import org.cloudbus.cloudsim.core.CloudSimTags;
+
 import br.usp.icmc.lasdpc.cloudsim.Effector;
 import br.usp.icmc.lasdpc.cloudsim.Event;
 
@@ -26,6 +29,11 @@ public class MyEffector extends Effector {
 			
 			// set new values...
 			mybroker.sendEvents(dem);
+		}
+		
+		if (CloudSim.clock() == 100) {
+			double delay = 10;
+			mybroker.sendEvent(new Event(delay, CloudSimTags.END_OF_SIMULATION));
 		}
 	}
 

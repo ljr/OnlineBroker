@@ -42,6 +42,11 @@ public class VMAck {
 	public void setSuccess(int success) {
 		this.success = success;
 	}
-	
+
+	@Override
+	public String toString() {
+		return "[VM_ACK] {datacenterId: " + datacenterId + ", vmId: " + vmId + 
+				", success: " + success + "}";
+	}
 	
 }

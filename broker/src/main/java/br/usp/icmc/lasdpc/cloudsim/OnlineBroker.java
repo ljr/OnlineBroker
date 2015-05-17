@@ -170,22 +170,19 @@ public class OnlineBroker extends SimEntity {
 	
 	
 	public void sendEvents(List<Event> events) {
-		int id;
 		for (Event e : events) {
-			id = e.getDest() == -1 ? getId() : e.getDest();
-			Log.printConcatLine(CloudSim.clock(), ": [EVENT] {dest: ", id,
-					", delay: ", e.getDelay(), ", tag : ", e.getTag(),
-					", data: ", e.getData(), "}");
-			send(id, e.getDelay(), e.getTag(), e.getData());
+			sendEvent(e);
 		}
 	}
 
 
+	public void sendEvent(Event e) {
+		Log.printConcatLine(CloudSim.clock(), ": ", e);
+		int id = e.getDest() == -1 ? getId() : e.getDest();
+		send(id, e.getDelay(), e.getTag(), e.getData());
+	}
 
-	//=========================================================================
-	// Gets available for monitoring 
-	//=========================================================================
-	
+
 	public List<Integer> getDcs() {
 		return dcs;
 	}
