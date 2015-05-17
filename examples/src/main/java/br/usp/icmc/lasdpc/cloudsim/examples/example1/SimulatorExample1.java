@@ -45,7 +45,7 @@ public class SimulatorExample1 {
 		 */
 		int sampleTime = 10;
 		new OnlineBroker("OnlineBroker", sampleTime, new MyMonitor(), 
-				new MyEffector(), new MyCapacity(), new MyDemand());
+				new MyEffector(), new MyDemand(), new MyCapacity());
 		
 		
 		/*

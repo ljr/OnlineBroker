@@ -59,7 +59,7 @@ public class OnlineBroker extends SimEntity {
 	
 	
 	public OnlineBroker(String name, int sampleTime, Monitor monitor, 
-			Effector effector, Capacity capacity, Demand demand) throws Exception {
+			Effector effector, Demand demand, Capacity capacity) throws Exception {
 		super(name);
 		
 		this.sampleTime = sampleTime;
@@ -69,6 +69,7 @@ public class OnlineBroker extends SimEntity {
 		this.effector = effector;
 		this.effector.setMybroker(this);
 		this.demand = demand;
+		this.demand.setMyBroker(this);
 		
 		characteristics = new HashMap<Integer, DatacenterCharacteristics>();
 	}
@@ -105,6 +106,10 @@ public class OnlineBroker extends SimEntity {
 				processVmAck(ev);
 			break;
 			
+		case CloudSimTags.CLOUDLET_SUBMIT_ACK:
+				processCloudletAck(ev);
+			break;
+			
 		case CloudSimTags.CLOUDLET_RETURN:
 				processCloudletReturn(ev);
 			break;
@@ -114,12 +119,17 @@ public class OnlineBroker extends SimEntity {
 			break;
 			
 		default:
-				Log.print("Nothing to do here...");
+				Log.printConcatLine(CloudSim.clock(), ": Nothing to do here...");
 			break;
 		}
 	}
 
 	
+	private void processCloudletAck(SimEvent ev) {
+		
+	}
+
+
 	private void processCloudletReturn(SimEvent ev) {
 		
 	}

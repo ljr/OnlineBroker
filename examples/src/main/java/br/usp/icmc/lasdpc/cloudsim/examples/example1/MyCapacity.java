@@ -48,7 +48,7 @@ public class MyCapacity extends Capacity {
 	private void setCapacity(double clock) {
 		if (clock == 10) { 
 			createVM();
-		} else if (clock == 40) {
+		} else if (clock == 900) {
 			destroyVM();
 		}
 	}

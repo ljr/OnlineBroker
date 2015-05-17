@@ -31,7 +31,7 @@ public class MyEffector extends Effector {
 			mybroker.sendEvents(dem);
 		}
 		
-		if (CloudSim.clock() == 100) {
+		if (CloudSim.clock() == 1000) {
 			double delay = 10;
 			mybroker.sendEvent(new Event(delay, CloudSimTags.END_OF_SIMULATION));
 		}
