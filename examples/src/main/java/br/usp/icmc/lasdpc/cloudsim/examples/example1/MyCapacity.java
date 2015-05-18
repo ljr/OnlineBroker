@@ -17,7 +17,7 @@ public class MyCapacity extends Capacity {
 
 	
 	@Override
-	public List<Event> update(Map<Integer, List<Object>> values) {
+	public List<Event> update(Map<Integer, Map<String, List<Object>>> values) {
 		
 		// TODO: always clear events before calling it.
 		events.clear();
@@ -26,14 +26,14 @@ public class MyCapacity extends Capacity {
 			switch (k) {
 			case CloudSimTags.EXPERIMENT:
 				
-				setCapacity((double) values.get(k).get(0));
+				setCapacity((double) values.get(k).get("CLOCK").get(0));
 				
 				break;
 
 			case CloudSimTags.VM_CREATE_ACK:
 			case CloudSimTags.VM_DESTROY_ACK:
 				
-				processVmAck(values.get(k), k == CloudSimTags.VM_CREATE_ACK);
+				processVmAck(values.get(k).get("ACK"), k == CloudSimTags.VM_CREATE_ACK);
 				
 				break;
 			

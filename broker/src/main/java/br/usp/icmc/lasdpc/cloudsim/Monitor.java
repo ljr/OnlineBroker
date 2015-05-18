@@ -1,23 +1,23 @@
 package br.usp.icmc.lasdpc.cloudsim;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 
 public abstract class Monitor {
 	
-	protected Map<Integer, List<Object>> values;
+	protected Map<Integer, Map<String, List<Object>>> values;
 
 	public Monitor() {
-		values = new HashMap<Integer, List<Object>>();
+		values = new HashMap<Integer, Map<String, List<Object>>>();
 	}
 	
 	public abstract void get();
 
 	
-	public Map<Integer, List<Object>> getValues() {
+	public Map<Integer, Map<String, List<Object>>> getValues() {
 		return values;
 	}
 
@@ -26,11 +26,15 @@ public abstract class Monitor {
 		values.clear();
 	}
 
-	public void add(int key, Object value) {
-		if (values.get(key) == null) {
-			values.put(key, new ArrayList<Object>());
+	public void add(int tag, String name, Object value) {
+		if (values.get(tag) == null) {
+			values.put(tag, new HashMap<String, List<Object>>());
 		}
 		
-		values.get(key).add(value);
+		if (values.get(tag).get(name) == null) {
+			values.get(tag).put(name, new LinkedList<Object>());
+		}
+
+		values.get(tag).get(name).add(value);
 	}
 }

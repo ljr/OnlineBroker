@@ -27,7 +27,7 @@ public abstract class Capacity {
 		return mybroker;
 	}
 	
-	public abstract List<Event> update(Map<Integer, List<Object>> values);
+	public abstract List<Event> update(Map<Integer, Map<String, List<Object>>> values);
 	
 	protected void create(Vm vm) {
 		vms.put(vm.getId(), new Object[] {vm, null});

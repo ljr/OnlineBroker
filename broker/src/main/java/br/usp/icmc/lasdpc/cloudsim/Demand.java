@@ -20,7 +20,7 @@ public abstract class Demand {
 		cloudlets = new LinkedHashSet<Cloudlet>();
 	}
 	
-	public abstract List<Event> update(Map<Integer, List<Object>> values);
+	public abstract List<Event> update(Map<Integer, Map<String, List<Object>>> values);
 	
 	
 	public void setMyBroker(OnlineBroker mybroker) {

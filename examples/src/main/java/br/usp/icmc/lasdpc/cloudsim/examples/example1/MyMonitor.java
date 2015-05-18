@@ -9,7 +9,7 @@ public class MyMonitor extends Monitor {
 
 	@Override
 	public void get() {
-		add(CloudSimTags.EXPERIMENT, CloudSim.clock());
+		add(CloudSimTags.EXPERIMENT, "CLOCK", CloudSim.clock());
 	}
 
 

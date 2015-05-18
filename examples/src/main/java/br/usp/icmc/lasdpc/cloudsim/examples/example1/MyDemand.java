@@ -17,7 +17,7 @@ import br.usp.icmc.lasdpc.cloudsim.Event;
 public class MyDemand extends Demand {
 
 	@Override
-	public List<Event> update(Map<Integer, List<Object>> values) {
+	public List<Event> update(Map<Integer, Map<String, List<Object>>> values) {
 		
 		// TODO: always clear events before calling it.
 		events.clear();
@@ -26,19 +26,19 @@ public class MyDemand extends Demand {
 			switch (k) {
 			case CloudSimTags.EXPERIMENT:
 				
-				setDemand((double) values.get(k).get(0));
+				setDemand((double) values.get(k).get("CLOCK").get(0));
 				
 				break;
 				
 			case CloudSimTags.CLOUDLET_SUBMIT_ACK:
 				
-				processCloudletAck(values.get(k));
+				processCloudletAck(values.get(k).get("ACK"));
 				
 				break;
 
 			case CloudSimTags.CLOUDLET_RETURN:
 				
-				processCloudletReturn(values.get(k));
+				processCloudletReturn(values.get(k).get("CLOUDLET"));
 				
 				break;
 				
