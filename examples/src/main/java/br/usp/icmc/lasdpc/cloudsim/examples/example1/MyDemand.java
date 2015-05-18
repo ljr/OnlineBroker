@@ -36,6 +36,12 @@ public class MyDemand extends Demand {
 				
 				break;
 
+			case CloudSimTags.CLOUDLET_RETURN:
+				
+				processCloudletReturn(values.get(k));
+				
+				break;
+				
 			default:
 				break;
 			}
@@ -44,20 +50,45 @@ public class MyDemand extends Demand {
 		return events;
 	}
 
+	private void processCloudletReturn(List<Object> cls) {
+		for (Object c : cls) {
+			Cloudlet cl = (Cloudlet) c;
+			
+			switch (cl.getStatus()) {
+			case Cloudlet.SUCCESS:
+				Log.printConcatLine(CloudSim.clock(), " [CLOUDLET] success executed.");
+				break;
+
+			case Cloudlet.FAILED:
+			case Cloudlet.FAILED_RESOURCE_UNAVAILABLE:
+				Log.printConcatLine(CloudSim.clock(), " [CLOUDLET] Failed at cloudlet creation.");
+				submitCloudlet(cl);
+				break;
+				
+			default:
+				break;
+			}
+		}
+	}
+
 	private void processCloudletAck(List<Object> acks) {
 		for (Object v : acks) {
 			Ack va = (Ack) v;
-			
+
 			Log.printConcatLine(CloudSim.clock(), ": ", va);
 		}
 	}
 
 	private void setDemand(double clock) {
 		if (clock == 20) {
-			Cloudlet cl = newCloudlet();
-			events.add(new Event(capacity.getDatacenter(cl.getVmId()), 
-					CloudSimTags.CLOUDLET_SUBMIT_ACK, cl));
+			submitCloudlet(newCloudlet());
 		}
+	}
+	
+	private void submitCloudlet(Cloudlet cl) {
+		create(cl);
+		events.add(new Event(capacity.getDatacenter(cl.getVmId()), 
+				CloudSimTags.CLOUDLET_SUBMIT_ACK, cl));
 	}
 
 	private Cloudlet newCloudlet() {
