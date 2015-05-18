@@ -32,7 +32,7 @@ public class OnlineBroker extends SimEntity {
 	/** 
 	 * Unique identification (tag) for Sample events. 
 	 */
-	private static final int SAMPLE_TIME = 80801;
+	private static final int SAMPLE = 80801;
 	
 	/** 
 	 * Monitor class, its responsibility is get information about the system 
@@ -70,6 +70,7 @@ public class OnlineBroker extends SimEntity {
 		this.effector.setMybroker(this);
 		this.demand = demand;
 		this.demand.setMyBroker(this);
+		this.demand.setCapacity(capacity);
 		
 		characteristics = new HashMap<Integer, DatacenterCharacteristics>();
 	}
@@ -77,7 +78,7 @@ public class OnlineBroker extends SimEntity {
 
 	@Override
 	public void startEntity() {
-		send(getId(), sampleTime, SAMPLE_TIME);
+		send(getId(), sampleTime, SAMPLE);
 		//sendNow(getId(), SAMPLE_TIME);
 		sendNow(getId(), CloudSimTags.RESOURCE_CHARACTERISTICS_REQUEST);
 		Log.printConcatLine("****************************************\n\t", 
@@ -97,17 +98,17 @@ public class OnlineBroker extends SimEntity {
 				getCharacteristic(ev);
 			break;
 			
-		case SAMPLE_TIME:
+		case SAMPLE:
 				processSample(ev);
 			break;
 			
 		case CloudSimTags.VM_CREATE_ACK:
 		case CloudSimTags.VM_DESTROY_ACK:
-				processVmAck(ev);
+			processAck(ev, "VM");
 			break;
 			
 		case CloudSimTags.CLOUDLET_SUBMIT_ACK:
-				processCloudletAck(ev);
+				processAck(ev, "CLOUDLET");
 			break;
 			
 		case CloudSimTags.CLOUDLET_RETURN:
@@ -124,23 +125,18 @@ public class OnlineBroker extends SimEntity {
 		}
 	}
 
-	
-	private void processCloudletAck(SimEvent ev) {
-		
-	}
-
 
 	private void processCloudletReturn(SimEvent ev) {
 		
 	}
 
 
-	private void processVmAck(SimEvent ev) {
+	private void processAck(SimEvent ev, String desc) {
 		int[] data = (int[]) ev.getData();
 		// data[0]: datacenter.id
 		// data[1]: vm.id
 		// data[2]: success?
-		monitor.add(ev.getTag(), new VMAck(data[0], data[1], data[2]));
+		monitor.add(ev.getTag(), new Ack(data[0], data[1], data[2], desc));
 	}
 
 
@@ -169,13 +165,16 @@ public class OnlineBroker extends SimEntity {
 	
 	
 	private void processSample(SimEvent ev) {
-		effector.set(
-				capacity.update(monitor.get()), 
-				demand.update(monitor.get())
-		);
-		monitor.clear();
+		monitor.get();
 		
-		send(getId(), sampleTime, SAMPLE_TIME);
+		effector.set(
+				capacity.update(monitor.getValues()), 
+				demand.update(monitor.getValues())
+		);
+		
+		monitor.clearValues();
+		
+		send(getId(), sampleTime, SAMPLE);
 	}
 	
 	

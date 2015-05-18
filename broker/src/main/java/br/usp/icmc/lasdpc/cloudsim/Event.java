@@ -29,9 +29,6 @@ public class Event {
 		this(dest, 0, tag, data);
 	}
 	
-	public Event(int dest, int tag) {
-		this(dest, 0, tag, null);
-	}
 	
 	public int getDest() {
 		return dest;

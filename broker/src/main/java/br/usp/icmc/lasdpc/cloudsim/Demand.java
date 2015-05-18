@@ -10,11 +10,15 @@ public abstract class Demand {
 	protected OnlineBroker mybroker;
 	protected List<Event> events;
 	protected Map<Integer, Object[]> cloudlets;
+	protected Capacity capacity;
 	
 	public Demand() {
 		events = new ArrayList<Event>();
 		cloudlets = new HashMap<Integer, Object[]>();
 	}
+	
+	public abstract List<Event> update(Map<Integer, List<Object>> values);
+	
 	
 	public void setMyBroker(OnlineBroker mybroker) {
 		this.mybroker = mybroker;
@@ -23,7 +27,15 @@ public abstract class Demand {
 	public OnlineBroker getMyBroker() {
 		return mybroker;
 	}
+
+	public Capacity getCapacity() {
+		return capacity;
+	}
+
+	public void setCapacity(Capacity capacity) {
+		this.capacity = capacity;
+	}
 	
-	public abstract List<Event> update(Map<Integer, List<Object>> values);
+	
 
 }

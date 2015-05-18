@@ -11,7 +11,7 @@ import org.cloudbus.cloudsim.core.CloudSimTags;
 
 import br.usp.icmc.lasdpc.cloudsim.Capacity;
 import br.usp.icmc.lasdpc.cloudsim.Event;
-import br.usp.icmc.lasdpc.cloudsim.VMAck;
+import br.usp.icmc.lasdpc.cloudsim.Ack;
 
 public class MyCapacity extends Capacity {
 
@@ -55,11 +55,11 @@ public class MyCapacity extends Capacity {
 
 	private void processVmAck(List<Object> acks, boolean isCreate) {
 		for (Object v : acks) {
-			VMAck va = (VMAck) v;
+			Ack va = (Ack) v;
 			Log.printConcatLine(CloudSim.clock(), ": ", va);
 			
 			if (va.getSuccess() == CloudSimTags.TRUE) {
-				setVMDatacenter(va.getVmId(), 
+				setVMDatacenter(va.getId(), 
 						isCreate ? va.getDatacenterId() : null);
 			}
 		}		

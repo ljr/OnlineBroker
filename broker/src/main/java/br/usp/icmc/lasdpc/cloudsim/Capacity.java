@@ -37,16 +37,24 @@ public abstract class Capacity {
 		vms.put(vmId, new Object[] {vms.get(vmId)[0], datacenterId});
 	}
 	
-	protected Vm getVm(int vmId) {
+	public Vm getVm(int vmId) {
 		return (Vm) getValue(vmId, 0);
 	}
 	
-	protected int getDatacenter(int vmId) {
-		return (int) getValue(vmId, 1);
+	public Integer getDatacenter(int vmId) {
+		return (Integer) getValue(vmId, 1);
 	}
 	
 	private Object getValue(int vmId, int i) {
 		return vms.get(vmId)[i];
 	}
 
+	public boolean isVmActive(int vmId) {
+		return getDatacenter(vmId) != null;
+	}
+
+	public Map<Integer, Object[]> getVms() {
+		return vms;
+	}
+	
 }

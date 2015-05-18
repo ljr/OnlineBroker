@@ -1,16 +1,18 @@
 package br.usp.icmc.lasdpc.cloudsim;
 
-public class VMAck {
+public class Ack {
 
 	private int datacenterId;
-	private int vmId;
+	private int id;
 	private int success;
+	private String desc;
 
 	
-	public VMAck(int datacenterId, int vmId, int success) {
+	public Ack(int datacenterId, int id, int success, String desc) {
 		this.datacenterId = datacenterId;
-		this.vmId = vmId;
+		this.id = id;
 		this.success = success;
+		this.desc = desc;
 	}
 	
 	
@@ -24,13 +26,13 @@ public class VMAck {
 	}
 	
 
-	public int getVmId() {
-		return vmId;
+	public int getId() {
+		return id;
 	}
 	
 
-	public void setVmId(int vmId) {
-		this.vmId = vmId;
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	
@@ -45,7 +47,7 @@ public class VMAck {
 
 	@Override
 	public String toString() {
-		return "[VM_ACK] {datacenterId: " + datacenterId + ", vmId: " + vmId + 
+		return "[" + desc + "_ACK] {datacenterId: " + datacenterId + ", entityId: " + id + 
 				", success: " + success + "}";
 	}
 	

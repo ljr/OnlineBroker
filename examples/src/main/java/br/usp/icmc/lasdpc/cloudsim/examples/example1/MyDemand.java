@@ -4,10 +4,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.cloudbus.cloudsim.Cloudlet;
+import org.cloudbus.cloudsim.Log;
 import org.cloudbus.cloudsim.UtilizationModel;
 import org.cloudbus.cloudsim.UtilizationModelFull;
+import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.core.CloudSimTags;
 
+import br.usp.icmc.lasdpc.cloudsim.Ack;
 import br.usp.icmc.lasdpc.cloudsim.Demand;
 import br.usp.icmc.lasdpc.cloudsim.Event;
 
@@ -22,10 +25,15 @@ public class MyDemand extends Demand {
 		for (int k : values.keySet()) {
 			switch (k) {
 			case CloudSimTags.EXPERIMENT:
-				double clock = (Double) values.get(k).get(0);
-				if (clock == 20) {
-					events.add(new Event(-1, CloudSimTags.CLOUDLET_SUBMIT_ACK, newCloudlet()));
-				}
+				
+				setDemand((double) values.get(k).get(0));
+				
+				break;
+				
+			case CloudSimTags.CLOUDLET_SUBMIT_ACK:
+				
+				processCloudletAck(values.get(k));
+				
 				break;
 
 			default:
@@ -34,6 +42,22 @@ public class MyDemand extends Demand {
 		}
 
 		return events;
+	}
+
+	private void processCloudletAck(List<Object> acks) {
+		for (Object v : acks) {
+			Ack va = (Ack) v;
+			
+			Log.printConcatLine(CloudSim.clock(), ": ", va);
+		}
+	}
+
+	private void setDemand(double clock) {
+		if (clock == 20) {
+			Cloudlet cl = newCloudlet();
+			events.add(new Event(capacity.getDatacenter(cl.getVmId()), 
+					CloudSimTags.CLOUDLET_SUBMIT_ACK, cl));
+		}
 	}
 
 	private Cloudlet newCloudlet() {
@@ -49,10 +73,25 @@ public class MyDemand extends Demand {
 				outputSize, utilizationModel, utilizationModel, 
 				utilizationModel);
 		cloudlet.setUserId(mybroker.getId());
-		//cloudlet.setVmId(vmid); // TODO: where to set vm to execute this task?
+		cloudlet.setVmId(chooseVm()); // TODO: where to set vm to execute this task?
 		
 		return cloudlet;
 	}
 	
+	
+	/**
+	 * Pick the first active VM.
+	 * 
+	 * @return the chosen one.
+	 */
+	private int chooseVm() {
+		for (int vmId : capacity.getVms().keySet()) {
+			if (capacity.isVmActive(vmId)) {
+				return vmId;
+			}
+		}
+		
+		return -1;
+	}
 	
 }
