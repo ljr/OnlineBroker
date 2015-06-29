@@ -19,13 +19,15 @@ public class MyEffector extends Effector {
 		
 		if (cap != null && cap.size() > 0) {
 			// change delay of the events here...
-			
+
 			// set new values...
 			mybroker.sendEvents(cap);
 		}
 		
 		if (dem.size() > 0) {
 			// change delay of the events here...
+
+			// TODO: do the cloudlets biding to VMs.
 			
 			// set new values...
 			mybroker.sendEvents(dem);

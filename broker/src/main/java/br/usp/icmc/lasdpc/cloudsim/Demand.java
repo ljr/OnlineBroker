@@ -12,7 +12,9 @@ public abstract class Demand {
 	
 	protected OnlineBroker mybroker;
 	protected List<Event> events;
+	/** Tasks to be submitted. Each one must be assigned to a VM */
 	protected Set<Cloudlet> cloudlets;
+	/** Demand needs to refer to capacity to get an available VM to assign to a cloudlet */
 	protected Capacity capacity;
 	
 	public Demand() {
@@ -20,7 +22,7 @@ public abstract class Demand {
 		cloudlets = new LinkedHashSet<Cloudlet>();
 	}
 	
-	public abstract List<Event> update(Map<Integer, Map<String, List<Object>>> values);
+	public abstract List<Event> update(Map<Integer, List<Object>> values);
 	
 	
 	public void setMyBroker(OnlineBroker mybroker) {

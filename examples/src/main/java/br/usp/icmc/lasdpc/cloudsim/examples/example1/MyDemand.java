@@ -17,7 +17,7 @@ import br.usp.icmc.lasdpc.cloudsim.Event;
 public class MyDemand extends Demand {
 
 	@Override
-	public List<Event> update(Map<Integer, Map<String, List<Object>>> values) {
+	public List<Event> update(Map<Integer, List<Object>> values) {
 		
 		// TODO: always clear events before calling it.
 		events.clear();
@@ -26,19 +26,19 @@ public class MyDemand extends Demand {
 			switch (k) {
 			case CloudSimTags.EXPERIMENT:
 				
-				setDemand((double) values.get(k).get("CLOCK").get(0));
+				setDemand((double) values.get(MonitorValues.CLOCK).get(0));
 				
 				break;
 				
 			case CloudSimTags.CLOUDLET_SUBMIT_ACK:
 				
-				processCloudletAck(values.get(k).get("ACK"));
+				processCloudletAck(values.get(CloudSimTags.CLOUDLET_SUBMIT_ACK));
 				
 				break;
 
 			case CloudSimTags.CLOUDLET_RETURN:
 				
-				processCloudletReturn(values.get(k).get("CLOUDLET"));
+				processCloudletReturn(values.get(CloudSimTags.CLOUDLET_RETURN));
 				
 				break;
 				
@@ -51,10 +51,10 @@ public class MyDemand extends Demand {
 	}
 
 	private void processCloudletReturn(List<Object> cls) {
-		for (Object c : cls) {
-			Cloudlet cl = (Cloudlet) c;
-			
-			switch (cl.getStatus()) {
+		@SuppressWarnings("unchecked")
+		List<Cloudlet> cll = (List<Cloudlet>)(Object) cls;
+		for (Cloudlet c : cll) {
+			switch (c.getStatus()) {
 			case Cloudlet.SUCCESS:
 				Log.printConcatLine(CloudSim.clock(), " [CLOUDLET] success executed.");
 				break;
@@ -62,7 +62,7 @@ public class MyDemand extends Demand {
 			case Cloudlet.FAILED:
 			case Cloudlet.FAILED_RESOURCE_UNAVAILABLE:
 				Log.printConcatLine(CloudSim.clock(), " [CLOUDLET] Failed at cloudlet creation.");
-				submitCloudlet(cl);
+				submitCloudlet(c);
 				break;
 				
 			default:

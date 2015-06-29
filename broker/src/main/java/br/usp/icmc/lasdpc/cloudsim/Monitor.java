@@ -8,33 +8,33 @@ import java.util.Map;
 
 public abstract class Monitor {
 	
-	protected Map<Integer, Map<String, List<Object>>> values;
+	protected Map<Integer, List<Object>> values;
 
 	public Monitor() {
-		values = new HashMap<Integer, Map<String, List<Object>>>();
+		values = new HashMap<Integer, List<Object>>();
 	}
 	
 	public abstract void get();
 
 	
-	public Map<Integer, Map<String, List<Object>>> getValues() {
+	public Map<Integer, List<Object>> getValues() {
 		return values;
 	}
 
 	
-	public void clearValues(){
+	public void clearValues() {
 		values.clear();
 	}
 
-	public void add(int tag, String name, Object value) {
-		if (values.get(tag) == null) {
-			values.put(tag, new HashMap<String, List<Object>>());
+	public void add(int tag, Object value) {
+		if (!values.containsKey(tag)) {
+			values.put(tag, new LinkedList<Object>());
 		}
 		
-		if (values.get(tag).get(name) == null) {
-			values.get(tag).put(name, new LinkedList<Object>());
-		}
-
-		values.get(tag).get(name).add(value);
+		values.get(tag).add(value);
+	}
+	
+	public List<Object> getValueFromTag(int tag) {
+		return values.get(tag);
 	}
 }

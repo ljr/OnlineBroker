@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.DatacenterCharacteristics;
 import org.cloudbus.cloudsim.Log;
 import org.cloudbus.cloudsim.core.CloudSim;
@@ -128,7 +127,7 @@ public class OnlineBroker extends SimEntity {
 
 
 	private void processCloudletReturn(SimEvent ev) {
-		monitor.add(ev.getTag(), "CLOUDLET", (Cloudlet) ev.getData());
+		monitor.add(ev.getTag(), ev.getData());
 	}
 
 
@@ -137,7 +136,7 @@ public class OnlineBroker extends SimEntity {
 		// data[0]: datacenter.id
 		// data[1]: vm.id
 		// data[2]: success?
-		monitor.add(ev.getTag(), "ACK", new Ack(data[0], data[1], data[2], desc));
+		monitor.add(ev.getTag(), new Ack(data[0], data[1], data[2], desc));
 	}
 
 

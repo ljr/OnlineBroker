@@ -10,6 +10,7 @@ import org.cloudbus.cloudsim.Vm;
 public abstract class Capacity {
 	
 	protected OnlineBroker mybroker;
+	/** It represents a bunch of virtual machines instances held by a Data-center. */
 	protected Map<Integer, Object[]> vms;
 	protected List<Event> events;
 	
@@ -27,7 +28,7 @@ public abstract class Capacity {
 		return mybroker;
 	}
 	
-	public abstract List<Event> update(Map<Integer, Map<String, List<Object>>> values);
+	public abstract List<Event> update(Map<Integer, List<Object>> values);
 	
 	protected void create(Vm vm) {
 		vms.put(vm.getId(), new Object[] {vm, null});
