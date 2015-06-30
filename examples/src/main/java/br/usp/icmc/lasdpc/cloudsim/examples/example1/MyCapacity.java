@@ -2,16 +2,15 @@ package br.usp.icmc.lasdpc.cloudsim.examples.example1;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.cloudbus.cloudsim.CloudletSchedulerTimeShared;
 import org.cloudbus.cloudsim.Log;
 import org.cloudbus.cloudsim.Vm;
-import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.core.CloudSimTags;
 
 import br.usp.icmc.lasdpc.cloudsim.Capacity;
 import br.usp.icmc.lasdpc.cloudsim.Event;
-import br.usp.icmc.lasdpc.cloudsim.Ack;
 
 public class MyCapacity extends Capacity {
 
@@ -47,35 +46,23 @@ public class MyCapacity extends Capacity {
 		if (clock == 10) { 
 			createVM();
 		} else if (clock == 900) {
-			destroyVM();
+			destroyAllVMs();
 		}
 	}
 
 	private void processVmAck(Map<Integer, List<Object>> values, int tag) {
-		boolean isCreate = tag == CloudSimTags.VM_CREATE_ACK;
-		
-		for (Object v : values.get(tag)) {
-			Ack va = (Ack) v;
-			Log.printConcatLine(CloudSim.clock(), ": ", va);
-			
-			if (va.getSuccess() == CloudSimTags.TRUE) {
-				setVMDatacenter(va.getId(), 
-						isCreate ? va.getDatacenterId() : null);
-			}
-		}		
+		Log.printConcatLine("[MyCapacity]: processing ACK");
 	}
 
-	private void destroyVM() {
-		for (int vm : vms.keySet()) {
-			events.add(new Event(getDatacenter(vm), 
-					CloudSimTags.VM_DESTROY_ACK, getVm(vm)));
-		}		
+	private void destroyAllVMs() {
+		for (Entry<Integer, Vm> e : getVms().entrySet()) {
+			events.add(new Event(getDatacenter(e.getValue().getId()),
+					CloudSimTags.VM_DESTROY_ACK, e.getValue()));
+		}
 	}
 
 	private void createVM() {
-		Vm vm = newVm(); 
-		create(vm);
-		events.add(new Event(chooseDataCenter(), CloudSimTags.VM_CREATE_ACK, vm));
+		events.add(new Event(chooseDataCenter(), CloudSimTags.VM_CREATE_ACK, newVm()));
 	}
 
 	private int chooseDataCenter() {
@@ -93,8 +80,10 @@ public class MyCapacity extends Capacity {
 		String vmm = "Xen"; // VMM name
 
 		// create VM
-		return new Vm(vmid, mybroker.getId(), mips, pesNumber, ram, bw, size, 
+		Vm vm = new Vm(vmid, mybroker.getId(), mips, pesNumber, ram, bw, size, 
 				vmm, new CloudletSchedulerTimeShared());
+		create(vm);
+		return vm;
 	}
 
 }

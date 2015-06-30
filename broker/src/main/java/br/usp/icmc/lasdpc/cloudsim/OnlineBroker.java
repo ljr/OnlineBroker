@@ -104,11 +104,8 @@ public class OnlineBroker extends SimEntity {
 			
 		case CloudSimTags.VM_CREATE_ACK:
 		case CloudSimTags.VM_DESTROY_ACK:
-				processAck(ev, "VM");
-			break;
-			
 		case CloudSimTags.CLOUDLET_SUBMIT_ACK:
-				processAck(ev, "CLOUDLET");
+				processAck(ev);
 			break;
 			
 		case CloudSimTags.CLOUDLET_RETURN:
@@ -131,12 +128,12 @@ public class OnlineBroker extends SimEntity {
 	}
 
 
-	private void processAck(SimEvent ev, String desc) {
+	private void processAck(SimEvent ev) {
 		int[] data = (int[]) ev.getData();
 		// data[0]: datacenter.id
 		// data[1]: vm.id
 		// data[2]: success?
-		monitor.add(ev.getTag(), new Ack(data[0], data[1], data[2], desc));
+		monitor.add(ev.getTag(), new Ack(data[0], data[1], data[2]));
 	}
 
 

@@ -72,9 +72,10 @@ public class MyDemand extends Demand {
 	}
 
 	private void processCloudletAck(List<Object> acks) {
-		for (Object v : acks) {
-			Ack va = (Ack) v;
-
+		@SuppressWarnings("unchecked")
+		List<Ack> lacks = (List<Ack>)(Object) acks;
+		for (Ack va : lacks) {
+			va.setDesc("CLOUDLET");
 			Log.printConcatLine(CloudSim.clock(), ": ", va);
 		}
 	}

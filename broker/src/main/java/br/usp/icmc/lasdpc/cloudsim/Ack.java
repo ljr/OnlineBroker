@@ -15,6 +15,9 @@ public class Ack {
 		this.desc = desc;
 	}
 	
+	public Ack(int datacenterId, int id, int success) {
+		this(datacenterId, id, success, "");
+	}
 	
 	public int getDatacenterId() {
 		return datacenterId;
@@ -43,6 +46,14 @@ public class Ack {
 	
 	public void setSuccess(int success) {
 		this.success = success;
+	}
+
+	public String getDesc() {
+		return desc;
+	}
+
+	public void setDesc(String desc) {
+		this.desc = desc;
 	}
 
 	@Override

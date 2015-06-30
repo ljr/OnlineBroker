@@ -5,13 +5,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import br.usp.icmc.lasdpc.cloudsim.lists.VmList;
+
 
 public abstract class Monitor {
 	
 	protected Map<Integer, List<Object>> values;
+	protected VmList vmList;
 
 	public Monitor() {
 		values = new HashMap<Integer, List<Object>>();
+		vmList = new VmList();
 	}
 	
 	public abstract void get();
@@ -36,5 +40,13 @@ public abstract class Monitor {
 	
 	public List<Object> getValueFromTag(int tag) {
 		return values.get(tag);
+	}
+
+	public VmList getVmList() {
+		return vmList;
+	}
+
+	public void setVmList(VmList vmList) {
+		this.vmList = vmList;
 	}
 }
