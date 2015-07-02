@@ -61,7 +61,7 @@ public class SimulatorExample1 {
 		/*
 		 * PRINT THE CLOUDLET'S DATA
 		 */
-		printCloudletList(ob.getDemand().getCloudlets());
+		printCloudletList(ob.getMonitor().getCloudletList());
 		
 		
 		System.out.println("SimulatorExample1 ended.");

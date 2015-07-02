@@ -1,26 +1,20 @@
 package br.usp.icmc.lasdpc.cloudsim;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.cloudbus.cloudsim.Cloudlet;
+import br.usp.icmc.lasdpc.cloudsim.aux.Event;
 
 public abstract class Demand {
 	
 	protected OnlineBroker mybroker;
-	protected List<Event> events;
-	/** Tasks to be submitted. Each one must be assigned to a VM */
-	protected Set<Cloudlet> cloudlets;
-	/** Demand needs to refer to capacity to get an available VM to assign to a cloudlet */
-	protected Capacity capacity;
+	protected List<Event> cloudlets;
 	
 	public Demand() {
-		events = new ArrayList<Event>();
-		cloudlets = new LinkedHashSet<Cloudlet>();
+		cloudlets = new ArrayList<Event>();
 	}
+	
 	
 	public abstract List<Event> update(Map<Integer, List<Object>> values);
 	
@@ -31,22 +25,6 @@ public abstract class Demand {
 	
 	public OnlineBroker getMyBroker() {
 		return mybroker;
-	}
-
-	public Capacity getCapacity() {
-		return capacity;
-	}
-
-	public void setCapacity(Capacity capacity) {
-		this.capacity = capacity;
-	}
-	
-	public void create(Cloudlet cl) {
-		cloudlets.add(cl);
-	}
-
-	public Set<Cloudlet> getCloudlets() {
-		return cloudlets;
 	}
 	
 

@@ -10,17 +10,16 @@ import org.cloudbus.cloudsim.UtilizationModelFull;
 import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.core.CloudSimTags;
 
-import br.usp.icmc.lasdpc.cloudsim.Ack;
 import br.usp.icmc.lasdpc.cloudsim.Demand;
-import br.usp.icmc.lasdpc.cloudsim.Event;
+import br.usp.icmc.lasdpc.cloudsim.aux.Ack;
+import br.usp.icmc.lasdpc.cloudsim.aux.Event;
 
 public class MyDemand extends Demand {
 
 	@Override
 	public List<Event> update(Map<Integer, List<Object>> values) {
 		
-		// TODO: always clear events before calling it.
-		events.clear();
+		cloudlets.clear();
 		
 		for (int k : values.keySet()) {
 			switch (k) {
@@ -47,7 +46,7 @@ public class MyDemand extends Demand {
 			}
 		}
 
-		return events;
+		return cloudlets;
 	}
 
 	private void processCloudletReturn(List<Object> cls) {
@@ -62,10 +61,10 @@ public class MyDemand extends Demand {
 			case Cloudlet.FAILED:
 			case Cloudlet.FAILED_RESOURCE_UNAVAILABLE:
 				Log.printConcatLine(CloudSim.clock(), " [CLOUDLET] Failed at cloudlet creation.");
-				submitCloudlet(c);
 				break;
 				
 			default:
+				
 				break;
 			}
 		}
@@ -82,15 +81,13 @@ public class MyDemand extends Demand {
 
 	private void setDemand(double clock) {
 		if (clock == 20) {
-			submitCloudlet(newCloudlet());
+			Event e = new Event();
+			e.setTag(CloudSimTags.CLOUDLET_SUBMIT_ACK);
+			e.setData(newCloudlet());
+			cloudlets.add(e);
 		}
 	}
 	
-	private void submitCloudlet(Cloudlet cl) {
-		create(cl);
-		events.add(new Event(capacity.getDatacenter(cl.getVmId()), 
-				CloudSimTags.CLOUDLET_SUBMIT_ACK, cl));
-	}
 
 	private Cloudlet newCloudlet() {
 		// Cloudlet properties
@@ -105,25 +102,10 @@ public class MyDemand extends Demand {
 				outputSize, utilizationModel, utilizationModel, 
 				utilizationModel);
 		cloudlet.setUserId(mybroker.getId());
-		cloudlet.setVmId(chooseVm()); // TODO: where to set vm to execute this task?
 		
 		return cloudlet;
 	}
 	
-	
-	/**
-	 * Pick the first active VM.
-	 * 
-	 * @return the chosen one.
-	 */
-	private int chooseVm() {
-		for (int vmId : capacity.getVms().keySet()) {
-			if (capacity.isVmActive(vmId)) {
-				return vmId;
-			}
-		}
-		
-		return -1;
-	}
+
 	
 }

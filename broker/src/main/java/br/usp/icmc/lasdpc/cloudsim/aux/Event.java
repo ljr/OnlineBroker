@@ -1,10 +1,14 @@
-package br.usp.icmc.lasdpc.cloudsim;
+package br.usp.icmc.lasdpc.cloudsim.aux;
 
 public class Event {
 	private int dest;
 	private double delay;
 	private int tag;
 	private Object data;
+	
+	public Event() {
+		this(-1, -1, -1, null);
+	}
 	
 	public Event(int dest, double delay, int tag, Object data) {
 		this.dest = dest;

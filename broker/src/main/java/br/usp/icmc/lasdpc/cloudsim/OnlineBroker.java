@@ -12,6 +12,9 @@ import org.cloudbus.cloudsim.core.CloudSimTags;
 import org.cloudbus.cloudsim.core.SimEntity;
 import org.cloudbus.cloudsim.core.SimEvent;
 
+import br.usp.icmc.lasdpc.cloudsim.aux.Ack;
+import br.usp.icmc.lasdpc.cloudsim.aux.Event;
+
 
 public class OnlineBroker extends SimEntity {
 	/**
@@ -70,7 +73,6 @@ public class OnlineBroker extends SimEntity {
 		this.effector.setMybroker(this);
 		this.demand = demand;
 		this.demand.setMyBroker(this);
-		this.demand.setCapacity(capacity);
 		
 		characteristics = new HashMap<Integer, DatacenterCharacteristics>();
 	}
@@ -163,12 +165,10 @@ public class OnlineBroker extends SimEntity {
 	
 	private void processSample(SimEvent ev) {
 		monitor.get();
-		
-		effector.set(
+		effector.update(
 				capacity.update(monitor.getValues()), 
 				demand.update(monitor.getValues())
 		);
-		
 		monitor.clearValues();
 		
 		send(getId(), sampleTime, SAMPLE);

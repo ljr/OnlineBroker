@@ -10,7 +10,7 @@ import org.cloudbus.cloudsim.Vm;
 import org.cloudbus.cloudsim.core.CloudSimTags;
 
 import br.usp.icmc.lasdpc.cloudsim.Capacity;
-import br.usp.icmc.lasdpc.cloudsim.Event;
+import br.usp.icmc.lasdpc.cloudsim.aux.Event;
 
 public class MyCapacity extends Capacity {
 
@@ -29,9 +29,7 @@ public class MyCapacity extends Capacity {
 
 			case CloudSimTags.VM_CREATE_ACK:
 			case CloudSimTags.VM_DESTROY_ACK:
-
 				processVmAck(values, k);
-				
 				break;
 			
 			default:
@@ -51,23 +49,23 @@ public class MyCapacity extends Capacity {
 	}
 
 	private void processVmAck(Map<Integer, List<Object>> values, int tag) {
-		Log.printConcatLine("[MyCapacity]: processing ACK");
+		Log.printConcatLine("[MyCapacity]: processing ACK - VM CREATED");
 	}
 
 	private void destroyAllVMs() {
-		for (Entry<Integer, Vm> e : getVms().entrySet()) {
-			events.add(new Event(getDatacenter(e.getValue().getId()),
+		for (Entry<Integer, Vm> e : getMyBroker().getMonitor().getVmList().getVms().entrySet()) {
+			events.add(new Event(e.getValue().getHost().getDatacenter().getId(),
 					CloudSimTags.VM_DESTROY_ACK, e.getValue()));
 		}
 	}
 
 	private void createVM() {
-		events.add(new Event(chooseDataCenter(), CloudSimTags.VM_CREATE_ACK, newVm()));
+		Event e = new Event();
+		e.setTag(CloudSimTags.VM_CREATE_ACK);
+		e.setData(newVm());
+		events.add(e);
 	}
 
-	private int chooseDataCenter() {
-		return mybroker.getDcs().get(0);
-	}
 
 	private Vm newVm() {
 		// VM description
@@ -82,7 +80,6 @@ public class MyCapacity extends Capacity {
 		// create VM
 		Vm vm = new Vm(vmid, mybroker.getId(), mips, pesNumber, ram, bw, size, 
 				vmm, new CloudletSchedulerTimeShared());
-		create(vm);
 		return vm;
 	}
 

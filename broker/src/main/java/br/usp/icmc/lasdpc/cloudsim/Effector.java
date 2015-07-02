@@ -3,6 +3,11 @@ package br.usp.icmc.lasdpc.cloudsim;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.cloudbus.cloudsim.Cloudlet;
+import org.cloudbus.cloudsim.Vm;
+
+import br.usp.icmc.lasdpc.cloudsim.aux.Event;
+
 
 public abstract class Effector {
 	
@@ -20,6 +25,22 @@ public abstract class Effector {
 	public void clear() {
 		cap.clear();
 		dem.clear();
+	}
+	
+	public void update(List<Event> cap, List<Event> dem) {
+		clear();
+		
+		for (Event e : cap) {
+			Vm vm = (Vm) e.getData();
+			mybroker.getMonitor().getVmList().getVms().put(vm.getId(), vm);
+		}
+		
+		for (Event e: dem) {
+			Cloudlet cl = (Cloudlet) e.getData();
+			mybroker.getMonitor().getCloudletList().add(cl);
+		}
+		
+		set(cap, dem);
 	}
 	
 	public OnlineBroker getMybroker() {

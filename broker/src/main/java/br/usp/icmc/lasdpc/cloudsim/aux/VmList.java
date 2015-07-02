@@ -1,7 +1,7 @@
-package br.usp.icmc.lasdpc.cloudsim.lists;
+package br.usp.icmc.lasdpc.cloudsim.aux;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -17,10 +17,10 @@ public class VmList {
 	}
 	
 	public List<Vm> getByDatacenter(int dc) {
-		List<Vm> r = new LinkedList<Vm>();
+		List<Vm> r = new ArrayList<Vm>();
 		
 		for (Entry<Integer, Vm> e : vms.entrySet()) {
-			if (getDatacenter(e.getValue().getId()) == dc) {
+			if (getDatacenterId(e.getValue().getId()) == dc) {
 				r.add(e.getValue());
 			}
 		}
@@ -28,7 +28,8 @@ public class VmList {
 		return r;
 	}
 	
-	public Integer getDatacenter(int vmId) {
+	
+	public Integer getDatacenterId(int vmId) {
 		return vms.get(vmId).getHost().getDatacenter().getId();
 	}
 	
@@ -43,9 +44,13 @@ public class VmList {
 			return vm;
 		}
 		
-		return vm;
+		return null;
 	}
 
+	public boolean isVmAllocated(int vmId) {
+		return !vms.get(vmId).isBeingInstantiated();
+	}
+	
 	public Map<Integer, Vm> getVms() {
 		return vms;
 	}
