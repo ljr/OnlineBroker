@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.Datacenter;
@@ -128,7 +127,7 @@ public class SimulatorExample1 {
 	 *
 	 * @param list list of Cloudlets
 	 */
-	private static void printCloudletList(Set<Cloudlet> cloudlets) {
+	private static void printCloudletList(List<Cloudlet> list) {
 		String indent = "    ";
 		Log.printLine();
 		Log.printLine("========== OUTPUT ==========");
@@ -137,7 +136,7 @@ public class SimulatorExample1 {
 				+ "Start Time" + indent + "Finish Time");
 
 		DecimalFormat dft = new DecimalFormat("###.##");
-		for (Cloudlet cloudlet : cloudlets) {
+		for (Cloudlet cloudlet : list) {
 			Log.print(indent + cloudlet.getCloudletId() + indent + indent);
 
 			if (cloudlet.getCloudletStatus() == Cloudlet.SUCCESS) {

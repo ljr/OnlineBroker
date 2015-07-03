@@ -170,7 +170,6 @@ public class OnlineBroker extends SimEntity {
 				demand.update(monitor.getValues())
 		);
 		monitor.clearValues();
-		
 		send(getId(), sampleTime, SAMPLE);
 	}
 	

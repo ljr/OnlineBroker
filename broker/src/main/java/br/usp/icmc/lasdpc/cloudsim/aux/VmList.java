@@ -16,6 +16,17 @@ public class VmList {
 		vms = new HashMap<Integer, Vm>();
 	}
 	
+	public void add(Vm e) {
+		vms.put(e.getId(), e);
+	}
+	
+	public void addAll(List<Vm> vms) {
+		for (Vm e : vms) {
+			add(e);
+		}
+	}
+	
+	
 	public List<Vm> getByDatacenter(int dc) {
 		List<Vm> r = new ArrayList<Vm>();
 		

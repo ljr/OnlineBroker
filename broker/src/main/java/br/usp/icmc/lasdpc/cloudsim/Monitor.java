@@ -1,11 +1,10 @@
 package br.usp.icmc.lasdpc.cloudsim;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.cloudbus.cloudsim.Cloudlet;
 
@@ -16,12 +15,12 @@ public abstract class Monitor {
 	
 	protected Map<Integer, List<Object>> values;
 	protected VmList vmList;
-	protected Set<Cloudlet> cloudletList;
+	protected List<Cloudlet> cloudletList;
 
 	public Monitor() {
 		values = new HashMap<Integer, List<Object>>();
 		vmList = new VmList();
-		cloudletList = new HashSet<Cloudlet>();
+		cloudletList = new ArrayList<Cloudlet>();
 	}
 	
 	public abstract void get();
@@ -56,11 +55,11 @@ public abstract class Monitor {
 		this.vmList = vmList;
 	}
 
-	public Set<Cloudlet> getCloudletList() {
+	public List<Cloudlet> getCloudletList() {
 		return cloudletList;
 	}
 
-	public void setCloudletList(Set<Cloudlet> cloudletList) {
+	public void setCloudletList(List<Cloudlet> cloudletList) {
 		this.cloudletList = cloudletList;
 	}
 }
