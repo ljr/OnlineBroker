@@ -25,6 +25,16 @@ public class DatacenterBroker extends OnlineBroker {
 		
 		cloudletReceivedList = new ArrayList<Cloudlet>();
 	}
+
+	public DatacenterBroker(String name) throws Exception {
+		this(name, 10, 
+				new DCMonitor(), 
+				new DCEffector(), 
+				new BatchDemand(), 
+				new BatchCapacity()
+		);
+	}
+	
 	
 	@Override
 	public void processEvent(SimEvent ev) {
@@ -34,17 +44,16 @@ public class DatacenterBroker extends OnlineBroker {
 			case CloudSimTags.CLOUDLET_RETURN:
 				cloudletReceivedList.add((Cloudlet) ev.getData());
 				break;
+				
+			case CloudSimTags.VM_CREATE_ACK:
+				((DCMonitor) getMonitor()).incVmsAcks();
+				break;
 			default:
 				
 		}
 	}
 	
 	
-
-	public DatacenterBroker(String name) throws Exception {
-		this(name, -1, null, null, null, null);
-	}
-
 	public void submitVmList(List<Vm> vmlist) {
 		getMonitor().getVmList().addAll(vmlist);
 	}

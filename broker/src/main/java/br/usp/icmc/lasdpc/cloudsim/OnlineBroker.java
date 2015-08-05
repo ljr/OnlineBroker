@@ -60,7 +60,7 @@ public class OnlineBroker extends SimEntity {
 	 */
 	private Demand demand;
 	
-	
+
 	public OnlineBroker(String name, int sampleTime, Monitor monitor, 
 			Effector effector, Demand demand, Capacity capacity) throws Exception {
 		super(name);
@@ -80,12 +80,12 @@ public class OnlineBroker extends SimEntity {
 
 	@Override
 	public void startEntity() {
-		send(getId(), sampleTime, SAMPLE);
-		//sendNow(getId(), SAMPLE_TIME);
+		//send(getId(), sampleTime, SAMPLE);
+		//sendNow(getId(), SAMPLE);
 		sendNow(getId(), CloudSimTags.RESOURCE_CHARACTERISTICS_REQUEST);
 		Log.printConcatLine("****************************************\n\t", 
 				getName(), 
-				" it started. \n****************************************");		
+				" was started. \n****************************************");		
 	}
 	
 
@@ -143,6 +143,10 @@ public class OnlineBroker extends SimEntity {
 	protected void getCharacteristic(SimEvent ev) {
 		DatacenterCharacteristics data = (DatacenterCharacteristics) ev.getData();
 		characteristics.put(data.getId(), data);
+		
+		if (characteristics.size() == dcs.size()) {
+			sendNow(getId(), SAMPLE);
+		}
 	}
 
 	
@@ -164,6 +168,7 @@ public class OnlineBroker extends SimEntity {
 	
 	
 	private void processSample(SimEvent ev) {
+		Log.printConcatLine("[", CloudSim.clock(), "]: executing Sample Event");
 		monitor.get();
 		effector.update(
 				capacity.update(monitor.getValues()), 
@@ -175,9 +180,11 @@ public class OnlineBroker extends SimEntity {
 	
 	
 	public void sendEvents(List<Event> events) {
+		
 		for (Event e : events) {
 			sendEvent(e);
 		}
+		
 	}
 
 

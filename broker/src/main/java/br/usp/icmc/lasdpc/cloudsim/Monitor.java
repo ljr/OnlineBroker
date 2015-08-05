@@ -2,7 +2,6 @@ package br.usp.icmc.lasdpc.cloudsim;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +36,7 @@ public abstract class Monitor {
 
 	public void add(int tag, Object value) {
 		if (!values.containsKey(tag)) {
-			values.put(tag, new LinkedList<Object>());
+			values.put(tag, new ArrayList<Object>());
 		}
 		
 		values.get(tag).add(value);

@@ -15,7 +15,7 @@ public class VmList {
 	public VmList() {
 		vms = new HashMap<Integer, Vm>();
 	}
-	
+
 	public void add(Vm e) {
 		vms.put(e.getId(), e);
 	}
@@ -65,7 +65,7 @@ public class VmList {
 	public Map<Integer, Vm> getVms() {
 		return vms;
 	}
-
+	
 	public void setVms(Map<Integer, Vm> vms) {
 		this.vms = vms;
 	}
