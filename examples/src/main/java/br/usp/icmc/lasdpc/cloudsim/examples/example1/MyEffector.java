@@ -59,7 +59,7 @@ public class MyEffector extends Effector {
 		// TODO SCHEDULE A CLOUDLET TO A VM.
 		Vm vm = null;
 		
-		for (Entry<Integer, Vm> e : getMybroker().getMonitor().getVmList().getVms().entrySet()) {
+		for (Entry<Integer, Vm> e : getMybroker().getMonitor().getVmManager().getVms().entrySet()) {
 			vm = e.getValue();
 		}
 		

@@ -53,7 +53,7 @@ public class MyCapacity extends Capacity {
 	}
 
 	private void destroyAllVMs() {
-		for (Entry<Integer, Vm> e : getMyBroker().getMonitor().getVmList().getVms().entrySet()) {
+		for (Entry<Integer, Vm> e : getMyBroker().getMonitor().getVmManager().getVms().entrySet()) {
 			events.add(new Event(e.getValue().getHost().getDatacenter().getId(),
 					CloudSimTags.VM_DESTROY_ACK, e.getValue()));
 		}

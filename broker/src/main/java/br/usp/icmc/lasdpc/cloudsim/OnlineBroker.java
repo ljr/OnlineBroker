@@ -131,11 +131,7 @@ public class OnlineBroker extends SimEntity {
 
 
 	private void processAck(SimEvent ev) {
-		int[] data = (int[]) ev.getData();
-		// data[0]: datacenter.id
-		// data[1]: vm.id
-		// data[2]: success?
-		monitor.add(ev.getTag(), new Ack(data[0], data[1], data[2]));
+		monitor.add(ev.getTag(), new Ack((int[]) ev.getData()));
 	}
 
 
@@ -180,11 +176,9 @@ public class OnlineBroker extends SimEntity {
 	
 	
 	public void sendEvents(List<Event> events) {
-		
 		for (Event e : events) {
 			sendEvent(e);
 		}
-		
 	}
 
 

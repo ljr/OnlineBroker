@@ -1,5 +1,7 @@
 package br.usp.icmc.lasdpc.cloudsim.aux;
 
+import org.cloudbus.cloudsim.core.CloudSimTags;
+
 public class Ack {
 
 	private int datacenterId;
@@ -17,6 +19,13 @@ public class Ack {
 	
 	public Ack(int datacenterId, int id, int success) {
 		this(datacenterId, id, success, "");
+	}
+	
+	public Ack(int []data) {
+		// data[0]: datacenter.id
+		// data[1]: <instance>.id (Vm, Cloudlet etc.)
+		// data[2]: success?
+		this(data[0], data[1], data[2]);
 	}
 	
 	public int getDatacenterId() {
@@ -43,6 +52,9 @@ public class Ack {
 		return success;
 	}
 
+	public boolean succeed() {
+		return getSuccess() == CloudSimTags.TRUE;
+	}
 	
 	public void setSuccess(int success) {
 		this.success = success;

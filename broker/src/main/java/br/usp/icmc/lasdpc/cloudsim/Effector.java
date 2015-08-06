@@ -32,7 +32,7 @@ public abstract class Effector {
 		
 		for (Event e : cap) {
 			Vm vm = (Vm) e.getData();
-			mybroker.getMonitor().getVmList().getVms().put(vm.getId(), vm);
+			mybroker.getMonitor().getVmManager().getVms().put(vm.getId(), vm);
 		}
 		
 		for (Event e: dem) {
