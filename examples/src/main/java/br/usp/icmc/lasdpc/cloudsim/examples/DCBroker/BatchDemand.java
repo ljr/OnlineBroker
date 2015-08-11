@@ -11,7 +11,6 @@ import br.usp.icmc.lasdpc.cloudsim.aux.Event;
 
 public class BatchDemand extends Demand {
 
-	private boolean submit = true;
 	
 	@Override
 	public List<Event> update(Map<Integer, List<Object>> values) {
@@ -19,13 +18,12 @@ public class BatchDemand extends Demand {
 
 		cloudlets.clear();
 		
-		if (isAllVmsCreated && submit) {
+		if (isAllVmsCreated && mybroker.getMonitor().submitCloudlets()) {
 			double delay = 0;
 			int tag = CloudSimTags.CLOUDLET_SUBMIT_ACK;
 			for (Cloudlet c : mybroker.getMonitor().getCloudletList()) {
 				cloudlets.add(new Event(delay, tag, c));
 			}
-			submit = false;
 		}
 		
 		return cloudlets;

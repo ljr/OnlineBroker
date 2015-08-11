@@ -1,6 +1,7 @@
 package br.usp.icmc.lasdpc.cloudsim.aux;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,13 +13,13 @@ public class VmManager {
 
 	private Map<Integer, Vm> vms;
 	private Map<Integer, Vm> createdMap;
-	private List<Vm> submitList;
+	private Map<Integer, Vm> submitted;
 	private int created;
 	private int destroyed;
 	
 	public VmManager() {
 		vms = new HashMap<Integer, Vm>();
-		submitList = new ArrayList<Vm>();
+		submitted = new HashMap<Integer, Vm>();
 		setCreatedMap(new HashMap<Integer, Vm>());
 		setCreated(0);
 		setDestroyed(0);
@@ -26,11 +27,11 @@ public class VmManager {
 
 	public void add(Vm e) {
 		vms.put(e.getId(), e);
-		submitList.add(e);
+		submitted.put(e.getId(), e);
 	}
 	
-	public List<Vm> getSubmitList() {
-		return submitList;
+	public Collection<Vm> getSubmitList() {
+		return submitted.values();
 	}
 	
 	public void addAll(List<Vm> vms) {
@@ -48,7 +49,7 @@ public class VmManager {
 			return false;
 		}
 		
-		getCreatedMap().put(vmId, getSubmitList().remove(vmId));
+		getCreatedMap().put(vmId, submitted.remove(vmId));
 		return true;
 	}
 	

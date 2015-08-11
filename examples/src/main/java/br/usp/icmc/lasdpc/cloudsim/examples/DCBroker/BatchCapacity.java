@@ -14,15 +14,17 @@ public class BatchCapacity extends Capacity {
 	private static final double DELAY = 0;
 	private static final int TAG = CloudSimTags.VM_CREATE_ACK;
 	
+	
 	@Override
 	public List<Event> update(Map<Integer, List<Object>> values) {
 		events.clear();
-		
+			
 		for (Vm vm : mybroker.getMonitor().getVmManager().getSubmitList()) {
 			events.add(new Event(DELAY, TAG, vm));
-		}	
-		
+		}
+			
 		return events;
 	}
+	
 
 }

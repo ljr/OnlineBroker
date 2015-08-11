@@ -3,6 +3,7 @@ package br.usp.icmc.lasdpc.cloudsim.examples.example1;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -127,7 +128,7 @@ public class SimulatorExample1 {
 	 *
 	 * @param list list of Cloudlets
 	 */
-	private static void printCloudletList(List<Cloudlet> list) {
+	private static void printCloudletList(Collection<Cloudlet> list) {
 		String indent = "    ";
 		Log.printLine();
 		Log.printLine("========== OUTPUT ==========");

@@ -35,11 +35,11 @@ public class DatacenterBroker extends OnlineBroker {
 	}
 
 	public int getTargetDc() throws Exception {
-		if (targetDc >= dcs.size()) {
+		if (dcs.isEmpty()) {
 			throw new Exception("No datacenter available.");
 		}
 		
-		return dcs.get(targetDc++);
+		return dcs.get(targetDc++ % dcs.size());
 	}
 	
 	public Vm getTargetVm() throws Exception {
@@ -76,6 +76,10 @@ public class DatacenterBroker extends OnlineBroker {
 			case CloudSimTags.VM_CREATE_ACK:
 				processVmCreate(ev);
 				
+			case SAMPLE:
+				if (getMonitor().allCloudletsProcessed()) {
+					finishExecution();
+				}
 				break;
 			default:
 				
@@ -108,7 +112,7 @@ public class DatacenterBroker extends OnlineBroker {
 	}
 
 	public void submitCloudletList(List<Cloudlet> cloudletList) {
-		getMonitor().getCloudletList().addAll(cloudletList);
+		getMonitor().getCloudletManager().add(cloudletList);
 	}
 
 	public List<Cloudlet> getCloudletReceivedList() {
@@ -117,6 +121,19 @@ public class DatacenterBroker extends OnlineBroker {
 
 	public void finishExecution() {
 		sendNow(getId(), CloudSimTags.END_OF_SIMULATION);
+	}
+
+	/**
+	 * Specifies that a given cloudlet must run in a specific virtual machine.
+	 * 
+	 * @param cloudletId ID of the cloudlet being bount to a vm
+	 * @param vmId the vm id
+	 * @pre cloudletId > 0
+	 * @pre id > 0
+	 * @post $none
+	 */
+	public void bindCloudletToVm(int cloudletId, int vmId) {
+		getMonitor().getCloudletManager().getById(cloudletId).setVmId(vmId);
 	}
 	
 }

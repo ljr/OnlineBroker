@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.Vm;
-import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.core.CloudSimTags;
 
 import br.usp.icmc.lasdpc.cloudsim.Effector;
@@ -35,8 +34,16 @@ public class DCEffector extends Effector {
 
 		for (Event e : dem) {
 			try {
-				Vm vm = broker.getTargetVm();
-				((Cloudlet) e.getData()).setVmId(vm.getId());
+				Vm vm;
+				Cloudlet cloudlet = (Cloudlet) e.getData();
+				
+				if (cloudlet.getVmId() == -1) { // schedule to a VM
+					vm = broker.getTargetVm();
+					cloudlet.setVmId(vm.getId());
+				} else { // user already bound the cloudlet to a VM 
+					vm = mybroker.getMonitor().getVmManager().getById(cloudlet.getVmId());
+				}
+				
 				e.setDest(vm.getHost().getDatacenter().getId());
 				mybroker.sendEvent(e);
 			} catch (Exception e1) {
@@ -45,9 +52,6 @@ public class DCEffector extends Effector {
 			}
 		}
 
-		if (CloudSim.clock() > 420) {
-			finishExecution();
-		}
 	}
 	
 	private void finishExecution() {

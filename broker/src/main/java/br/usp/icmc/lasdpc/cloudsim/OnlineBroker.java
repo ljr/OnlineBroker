@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.DatacenterCharacteristics;
 import org.cloudbus.cloudsim.Log;
 import org.cloudbus.cloudsim.core.CloudSim;
@@ -35,7 +36,7 @@ public class OnlineBroker extends SimEntity {
 	/** 
 	 * Unique identification (tag) for Sample events. 
 	 */
-	private static final int SAMPLE = 80801;
+	protected static final int SAMPLE = 80801;
 	
 	/** 
 	 * Monitor class, its responsibility is get information about the system 
@@ -127,6 +128,7 @@ public class OnlineBroker extends SimEntity {
 
 	private void processCloudletReturn(SimEvent ev) {
 		monitor.add(ev.getTag(), ev.getData());
+		monitor.getCloudletManager().receive((Cloudlet) ev.getData());
 	}
 
 

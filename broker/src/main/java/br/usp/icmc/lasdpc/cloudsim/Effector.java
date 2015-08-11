@@ -37,7 +37,7 @@ public abstract class Effector {
 		
 		for (Event e: dem) {
 			Cloudlet cl = (Cloudlet) e.getData();
-			mybroker.getMonitor().getCloudletList().add(cl);
+			mybroker.getMonitor().getCloudletManager().submit(cl);;
 		}
 		
 		set(cap, dem);
