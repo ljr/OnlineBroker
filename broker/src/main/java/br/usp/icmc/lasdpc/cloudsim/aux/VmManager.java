@@ -12,14 +12,16 @@ import org.cloudbus.cloudsim.Vm;
 public class VmManager {
 
 	private Map<Integer, Vm> vms;
-	private Map<Integer, Vm> createdMap;
-	private Map<Integer, Vm> submitted;
+	private Map<Integer, Vm> vmsCreated;
+	private Map<Integer, Vm> vmsSubmitted;
+	private Map<Integer, Vm> vmsFailed;
 	private int created;
 	private int destroyed;
 	
 	public VmManager() {
 		vms = new HashMap<Integer, Vm>();
-		submitted = new HashMap<Integer, Vm>();
+		vmsSubmitted = new HashMap<Integer, Vm>();
+		vmsFailed = new HashMap<Integer, Vm>();
 		setCreatedMap(new HashMap<Integer, Vm>());
 		setCreated(0);
 		setDestroyed(0);
@@ -27,11 +29,11 @@ public class VmManager {
 
 	public void add(Vm e) {
 		vms.put(e.getId(), e);
-		submitted.put(e.getId(), e);
+		vmsSubmitted.put(e.getId(), e);
 	}
 	
 	public Collection<Vm> getSubmitList() {
-		return submitted.values();
+		return vmsSubmitted.values();
 	}
 	
 	public void addAll(List<Vm> vms) {
@@ -41,7 +43,7 @@ public class VmManager {
 	}
 
 	public boolean allRequestedVmsDone() {
-		return getCreatedMap().size() == getVms().size() - getDestroyed();
+		return getCreatedMap().size() == getVms().size() - getDestroyed() - getFailed();
 	}
 	
 	public boolean created(int vmId) {
@@ -49,7 +51,16 @@ public class VmManager {
 			return false;
 		}
 		
-		getCreatedMap().put(vmId, submitted.remove(vmId));
+		getCreatedMap().put(vmId, vmsSubmitted.remove(vmId));
+		return true;
+	}
+	
+	public int getFailed() {
+		return vmsFailed.size();
+	}
+	
+	public boolean failed(int vmId) {
+		vmsFailed.put(vmId, vmsSubmitted.remove(vmId));
 		return true;
 	}
 	
@@ -135,11 +146,11 @@ public class VmManager {
 	}
 
 	public Map<Integer, Vm> getCreatedMap() {
-		return createdMap;
+		return vmsCreated;
 	}
 
 	public void setCreatedMap(Map<Integer, Vm> createdMap) {
-		this.createdMap = createdMap;
+		this.vmsCreated = createdMap;
 	}
 	
 	public List<Vm> getCreatedList() {

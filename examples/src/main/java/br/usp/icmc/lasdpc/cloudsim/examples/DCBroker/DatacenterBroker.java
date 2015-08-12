@@ -75,6 +75,7 @@ public class DatacenterBroker extends OnlineBroker {
 				
 			case CloudSimTags.VM_CREATE_ACK:
 				processVmCreate(ev);
+				break;
 				
 			case SAMPLE:
 				if (getMonitor().allCloudletsProcessed()) {
@@ -95,6 +96,7 @@ public class DatacenterBroker extends OnlineBroker {
 					": Creation of VM #", ack.getId(),
 					" OK in Datacenter #", ack.getDatacenterId());
 		} else {
+			getMonitor().getVmManager().failed(ack.getId());
 			Log.printConcatLine(CloudSim.clock(), ": ", getName(), 
 					": Creation of VM #", ack.getId(),
 					" failed in Datacenter #", ack.getDatacenterId());
