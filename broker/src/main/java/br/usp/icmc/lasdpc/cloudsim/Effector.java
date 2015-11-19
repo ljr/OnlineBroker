@@ -30,6 +30,8 @@ public abstract class Effector {
 	public void update(List<Event> cap, List<Event> dem) {
 		clear();
 		
+		set(cap, dem);
+		
 		for (Event e : cap) {
 			Vm vm = (Vm) e.getData();
 			mybroker.getMonitor().getVmManager().getVms().put(vm.getId(), vm);
@@ -39,8 +41,6 @@ public abstract class Effector {
 			Cloudlet cl = (Cloudlet) e.getData();
 			mybroker.getMonitor().getCloudletManager().submit(cl);;
 		}
-		
-		set(cap, dem);
 	}
 	
 	public OnlineBroker getMybroker() {

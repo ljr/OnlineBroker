@@ -120,12 +120,16 @@ public class OnlineBroker extends SimEntity {
 			break;
 			
 		default:
-				Log.printConcatLine(CloudSim.clock(), ": Nothing to do here...");
+				processOther(ev);
 			break;
 		}
 	}
 
-
+	private void processOther(SimEvent ev) {
+		monitor.add(ev.getTag(), ev.getData());
+	}
+	
+	
 	private void processCloudletReturn(SimEvent ev) {
 		monitor.add(ev.getTag(), ev.getData());
 		monitor.getCloudletManager().receive((Cloudlet) ev.getData());

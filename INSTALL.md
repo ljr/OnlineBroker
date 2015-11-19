@@ -16,4 +16,6 @@
 
 * Install OnlineBroker as a Maven Project
 
+* Add new source folders: `broker/src/main/java` and `examples/src/main/java`.
+
 Reference: [CloudSimEx](https://github.com/Cloudslab/CloudSimEx/wiki/Installation)
