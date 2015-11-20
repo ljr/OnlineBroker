@@ -1,6 +1,5 @@
 package br.usp.icmc.lasdpc.cloudsim.examples.DynamicController;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -11,36 +10,22 @@ import org.cloudbus.cloudsim.core.CloudSimTags;
 
 import br.usp.icmc.lasdpc.cloudsim.Effector;
 import br.usp.icmc.lasdpc.cloudsim.aux.Event;
+import br.usp.icmc.lasdpc.cloudsim.examples.DynamicController.PerformanceMonitor.MetaVm;
 
 public class AllocationEffector extends Effector {
 
-	private class MetaVm {
-		private Vm vm;
-		private double deadline;
-		
-		public MetaVm(double deadline, Vm vm) {
-			this.deadline = deadline;
-			this.vm = vm;
-		}
-		
-		public Vm getVm() {
-			return vm;
-		}
-		
-		public double getDeadline() {
-			return deadline;
-		}
-	}
 
 	private static final double DEFAULT_VM_START_DELAY = 40;
-	private Map<Integer, MetaVm> bleeding;
-	private Map<Integer,MetaVm> starting;
+	
 	private int dcRR;
 	private int  vmRR;
+	private Map<Integer, MetaVm> bleeding;
+	private Map<Integer, MetaVm> starting;
 	
 	public AllocationEffector() {
-		bleeding = new HashMap<Integer,MetaVm>();
-		starting = new HashMap<Integer,MetaVm>();
+		PerformanceMonitor mon = (PerformanceMonitor) mybroker.getMonitor();
+		bleeding = mon.getBleeding();
+		starting = mon.getStarting();
 		dcRR = vmRR = 0;
 	}
 	
@@ -61,7 +46,8 @@ public class AllocationEffector extends Effector {
 					rem[ri++] = i;
 				} else { // set as starting
 					starting.put(vm.getId(), 
-							new MetaVm(DEFAULT_VM_START_DELAY, vm));
+							((PerformanceMonitor) mybroker.getMonitor()).new 
+							MetaVm(DEFAULT_VM_START_DELAY, vm));
 				}
 				
 				break;
@@ -73,7 +59,8 @@ public class AllocationEffector extends Effector {
 				} else { // set to bleed
 					double howLongToFinish = vm.getCurrentRequestedTotalMips()/60; 
 					bleeding.put(vm.getId(), 
-							new MetaVm(howLongToFinish, vm));
+							((PerformanceMonitor) mybroker.getMonitor()).new
+							MetaVm(howLongToFinish, vm));
 				}
 				
 				break;
@@ -126,7 +113,7 @@ public class AllocationEffector extends Effector {
 				if (cloudlet.getVmId() == -1) { // schedule to a VM
 					vm = getTargetVm();
 					cloudlet.setVmId(vm.getId());
-				} else { // user already bound the cloudlet to a VM 
+				} else { // the cloudlet already bound to a VM 
 					vm = mybroker.getMonitor().getVmManager().getById(cloudlet.getVmId());
 				}
 				

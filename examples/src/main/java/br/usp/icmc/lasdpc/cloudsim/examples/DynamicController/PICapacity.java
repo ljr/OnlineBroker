@@ -16,11 +16,26 @@ public class PICapacity extends Capacity {
 	private int vmId;
 	private int userId;
 	private int vmsAtStart;
+	private double setPoint;
+	private double kp;
+	private double ki;
+	private double integral;
+	private double kd;
+	private double lastError;
+	private PerformanceMonitor mon;
 	
-	public PICapacity(int vmsAtStart) {
+	public PICapacity(int vmsAtStart, double setPoint, double kp, double ki, 
+			double kd) {
 		this.vmId = 1;
 		this.userId = 1;
 		this.vmsAtStart = vmsAtStart;
+		this.setPoint = setPoint;
+		this.kp = kp;
+		this.ki = ki;
+		this.integral = 0;
+		this.kd = kd;
+		this.lastError = 0;
+		mon = (PerformanceMonitor) mybroker.getMonitor();
 	}
 	
 	private synchronized int nextId() {
@@ -30,30 +45,31 @@ public class PICapacity extends Capacity {
 	@Override
 	public List<Event> update(Map<Integer, List<Object>> values) {
 		events.clear();
+	
+		double error = setPoint - (double) values.get(Tags.UTILIZATION).get(0);
+		long howManyVms = (CloudSim.clock() == 0? vmsAtStart : controller(error))
+				- mon.howManyVmsInSystem();
 		
-		if (CloudSim.clock() == 0) {
-			for (int i = 0; i < vmsAtStart; i++) {
+		if (howManyVms > 0) {
+			for (int i = 0; i < howManyVms; i++) {
 				events.add(new Event(/*delay = */ 0, CloudSimTags.VM_CREATE_ACK, 
-					newVm()));
+						newVm()));
 			}
+		} else if (howManyVms < 0) {
+			events.add(new Event(/*delay = */ 0, Tags.BLEED, -howManyVms));
 		}
-		
-		double u = (double) values.get(Tags.UTILIZATION).get(0);
-		
-		if (u > .8) {
-			events.add(new Event(/*delay = */ 0, CloudSimTags.VM_CREATE_ACK, 
-					new Vm(nextId(), userId, 1000, 1, 4096, 10000, 1024, "XEN", 
-							new CloudletSchedulerSpaceShared())));
-		}
-		
-		if (u < .6) {
-			events.add(new Event(0, Tags.BLEED, 1));
-		}
-		
 		
 		return events;
 	}
 
+	private long controller(double error) {
+		double diff = kd * (error - lastError);
+		double prop = kp * error;
+		integral += ki * error;
+		lastError = error;
+		return Math.round(Math.floor(prop + integral + diff));
+	}
+	
 	private Object newVm() {
 		return new Vm(nextId(), userId, 1000, 1, 4096, 10000, 1024, "XEN", 
 				new CloudletSchedulerSpaceShared());

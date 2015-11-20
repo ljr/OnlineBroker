@@ -14,8 +14,6 @@ import br.usp.icmc.lasdpc.cloudsim.aux.Event;
 import br.usp.icmc.lasdpc.cloudsim.distributions.PoissonDistr;
 
 public class StepDemand extends Demand {
-	// what is the best way of specifying this ID?
-	private static final int STEP = 23498;
 
 	private long seed;
 	private StepWorkloadBean workload;
@@ -46,14 +44,12 @@ public class StepDemand extends Demand {
 	public List<Event> update(Map<Integer, List<Object>> values) {
 		cloudlets.clear();
 		
-		if (CloudSim.clock() == 0) {
-			// TODO: is this suggesting a new name for cloudlets?
-			cloudlets.add(new Event(workload.getChangeTime(), STEP));
-		} else if (CloudSim.clock() == workload.getChangeTime()) { 
+		if (CloudSim.clock() >= workload.getChangeTime()) { 
 			setWorkload(workload.getLambdaAfter(), workload.getMuAfter());
 		}
 		
-		cloudlets.add(new Event(arrival.sample(), CloudSimTags.CLOUDLET_SUBMIT, newRequest()));
+		cloudlets.add(new Event(arrival.sample(), CloudSimTags.CLOUDLET_SUBMIT, 
+				newRequest()));
 		
 		return cloudlets;
 	}
