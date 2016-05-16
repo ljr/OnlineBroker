@@ -50,7 +50,8 @@ public class Sim1 {
 				new AllocationEffector(), 
 				new StepDemand(seed, StepDemand.newWorkload(lambdaBefore, 
 						lambdaAfter, muBefore, muAfter, changeTime)), 
-				new PICapacity(vmsAtStart, .7, kp, ki, kd));
+				new PICapacity(vmsAtStart, .7, kp, ki, kd)
+		);
 		
 		CloudSim.startSimulation();
 		CloudSim.stopSimulation();

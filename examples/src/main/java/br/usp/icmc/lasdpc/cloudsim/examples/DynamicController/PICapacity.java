@@ -9,6 +9,7 @@ import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.core.CloudSimTags;
 
 import br.usp.icmc.lasdpc.cloudsim.Capacity;
+import br.usp.icmc.lasdpc.cloudsim.OnlineBroker;
 import br.usp.icmc.lasdpc.cloudsim.aux.Event;
 
 public class PICapacity extends Capacity {
@@ -35,6 +36,10 @@ public class PICapacity extends Capacity {
 		this.integral = 0;
 		this.kd = kd;
 		this.lastError = 0;
+	}
+	
+	@Override
+	public void setMyBroker(OnlineBroker mybroker) {
 		mon = (PerformanceMonitor) mybroker.getMonitor();
 	}
 	
@@ -47,8 +52,15 @@ public class PICapacity extends Capacity {
 		events.clear();
 	
 		double error = setPoint - (double) values.get(Tags.UTILIZATION).get(0);
-		long howManyVms = (CloudSim.clock() == 0? vmsAtStart : controller(error))
-				- mon.howManyVmsInSystem();
+		long howManyVms;
+		
+		if (CloudSim.clock() == 0) {
+			howManyVms = vmsAtStart;
+		} else {
+			// TODO: is howManyVmsInSystem returning the right value?
+			howManyVms = controller(error) - mon.howManyVmsInSystem();
+		}
+				
 		
 		if (howManyVms > 0) {
 			for (int i = 0; i < howManyVms; i++) {

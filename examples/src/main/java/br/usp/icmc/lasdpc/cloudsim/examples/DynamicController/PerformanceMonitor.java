@@ -10,11 +10,11 @@ import br.usp.icmc.lasdpc.cloudsim.Monitor;
 
 public class PerformanceMonitor extends Monitor {
 
-	class MetaVm {
+	public class MetaVm {
 		private Vm vm;
 		private double deadline;
 		
-		public MetaVm(double deadline, Vm vm) {
+		MetaVm(double deadline, Vm vm) {
 			this.deadline = deadline;
 			this.vm = vm;
 		}
@@ -43,6 +43,10 @@ public class PerformanceMonitor extends Monitor {
 	
 	public Map<Integer, MetaVm> getStarting() {
 		return starting;
+	}
+	
+	public boolean canReceiveCloudlets() {
+		return getVmManager().getCreated() > 0;
 	}
 	
 	public int howManyVmsInSystem() {

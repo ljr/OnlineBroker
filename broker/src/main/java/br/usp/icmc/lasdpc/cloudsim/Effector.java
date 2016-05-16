@@ -33,8 +33,10 @@ public abstract class Effector {
 		set(cap, dem);
 		
 		for (Event e : cap) {
-			Vm vm = (Vm) e.getData();
-			mybroker.getMonitor().getVmManager().getVms().put(vm.getId(), vm);
+			if (e.getData() instanceof Vm) {
+				Vm vm = (Vm) e.getData();
+				mybroker.getMonitor().getVmManager().getVms().put(vm.getId(), vm);
+			}
 		}
 		
 		for (Event e: dem) {

@@ -10,6 +10,7 @@ import org.cloudbus.cloudsim.core.CloudSimTags;
 import org.cloudbus.cloudsim.distributions.ExponentialDistr;
 
 import br.usp.icmc.lasdpc.cloudsim.Demand;
+import br.usp.icmc.lasdpc.cloudsim.OnlineBroker;
 import br.usp.icmc.lasdpc.cloudsim.aux.Event;
 import br.usp.icmc.lasdpc.cloudsim.distributions.PoissonDistr;
 
@@ -21,6 +22,7 @@ public class StepDemand extends Demand {
 	private PoissonDistr service;
 	
 	private int cloudletId;
+	private PerformanceMonitor mon;
 	
 	
 	public StepDemand(long seed, StepWorkloadBean workload) {
@@ -28,6 +30,12 @@ public class StepDemand extends Demand {
 		this.workload = workload;
 		setWorkload(workload.getLambdaBefore(), workload.getMuBefore());
 		this.cloudletId = 1;
+	}
+	
+	@Override
+	public void setMyBroker(OnlineBroker mybroker) {
+		super.setMyBroker(mybroker);
+		mon = (PerformanceMonitor) mybroker.getMonitor();
 	}
 	
 	private synchronized int nextId() {
@@ -43,6 +51,10 @@ public class StepDemand extends Demand {
 	@Override
 	public List<Event> update(Map<Integer, List<Object>> values) {
 		cloudlets.clear();
+		
+		if (!mon.canReceiveCloudlets()) {
+			return cloudlets;
+		}
 		
 		if (CloudSim.clock() >= workload.getChangeTime()) { 
 			setWorkload(workload.getLambdaAfter(), workload.getMuAfter());
