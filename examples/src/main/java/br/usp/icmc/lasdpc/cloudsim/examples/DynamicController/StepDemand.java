@@ -22,6 +22,7 @@ public class StepDemand extends Demand {
 	private PoissonDistr service;
 	
 	private int cloudletId;
+	private int userId;
 	private PerformanceMonitor mon;
 	
 	
@@ -36,9 +37,11 @@ public class StepDemand extends Demand {
 	public void setMyBroker(OnlineBroker mybroker) {
 		super.setMyBroker(mybroker);
 		mon = (PerformanceMonitor) mybroker.getMonitor();
+		mon.setChangeTime(workload.getChangeTime());
+		this.userId = mybroker.getId();
 	}
 	
-	private synchronized int nextId() {
+	private int nextId() {
 		return this.cloudletId++;
 	}
 	
@@ -67,9 +70,11 @@ public class StepDemand extends Demand {
 	}
 	
 	private Cloudlet newRequest() {
-		return new Cloudlet(nextId(), service.sample(), 1, 0, 1024, 
+		Cloudlet cl = new Cloudlet(nextId(), service.sample(), 1, 0, 1024, 
 				new UtilizationModelFull(), new UtilizationModelFull(), 
 				new UtilizationModelFull());
+		cl.setUserId(userId);
+		return cl;
 	}
 
 	public static StepWorkloadBean newWorkload(double lambdaBefore, 

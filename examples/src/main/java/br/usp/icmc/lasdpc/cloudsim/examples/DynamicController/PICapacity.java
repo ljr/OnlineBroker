@@ -4,12 +4,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.cloudbus.cloudsim.CloudletSchedulerSpaceShared;
+import org.cloudbus.cloudsim.Log;
 import org.cloudbus.cloudsim.Vm;
 import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.core.CloudSimTags;
 
 import br.usp.icmc.lasdpc.cloudsim.Capacity;
 import br.usp.icmc.lasdpc.cloudsim.OnlineBroker;
+import br.usp.icmc.lasdpc.cloudsim.aux.Ack;
 import br.usp.icmc.lasdpc.cloudsim.aux.Event;
 
 public class PICapacity extends Capacity {
@@ -28,7 +30,7 @@ public class PICapacity extends Capacity {
 	public PICapacity(int vmsAtStart, double setPoint, double kp, double ki, 
 			double kd) {
 		this.vmId = 1;
-		this.userId = 1;
+		this.userId = -1; // MUST be set as mybroker.getId() @see setMyBroker
 		this.vmsAtStart = vmsAtStart;
 		this.setPoint = setPoint;
 		this.kp = kp;
@@ -40,7 +42,8 @@ public class PICapacity extends Capacity {
 	
 	@Override
 	public void setMyBroker(OnlineBroker mybroker) {
-		mon = (PerformanceMonitor) mybroker.getMonitor();
+		this.mon = (PerformanceMonitor) mybroker.getMonitor();
+		this.userId = mybroker.getId();
 	}
 	
 	private synchronized int nextId() {
@@ -56,9 +59,11 @@ public class PICapacity extends Capacity {
 		
 		if (CloudSim.clock() == 0) {
 			howManyVms = vmsAtStart;
-		} else {
+		} else if (mon.canReceiveCloudlets()) {
 			// TODO: is howManyVmsInSystem returning the right value?
 			howManyVms = controller(error) - mon.howManyVmsInSystem();
+		} else {
+			howManyVms = 0;
 		}
 				
 		
@@ -71,9 +76,42 @@ public class PICapacity extends Capacity {
 			events.add(new Event(/*delay = */ 0, Tags.BLEED, -howManyVms));
 		}
 		
+		processAck(values.get(CloudSimTags.VM_DESTROY_ACK), CloudSimTags.VM_DESTROY_ACK);
+		processAck(values.get(CloudSimTags.VM_CREATE_ACK), CloudSimTags.VM_CREATE_ACK);
+		
 		return events;
 	}
+	
+	private void processAck(List<Object> acks, int tag) {
+		if (acks == null) {
+			return;
+		}
+		
+		for (Object ack : acks) {
+			Ack vmAck = (Ack) ack;
+			if (vmAck.getSuccess() == CloudSimTags.TRUE) {
+				if (tag == CloudSimTags.VM_CREATE_ACK) {
+					mon.getVmManager().created(vmAck.getId());
+					//Log.printLine(">>> Host: " + mon.getVmManager().getById(vmAck.getId()).getHost());
+				}
+				
+				if (tag == CloudSimTags.VM_DESTROY_ACK) {
+					mon.getVmManager().destroyed(vmAck.getId());
+				}
 
+				//Log.printLine(vmAck);
+			} else {
+				finishExecution();
+			}
+		}
+	}
+
+	private void finishExecution() {
+		double delay = 0;
+		Log.printLine(">>> Ending simulation.");
+		mybroker.sendEvent(new Event(delay, CloudSimTags.END_OF_SIMULATION));
+	}
+	
 	private long controller(double error) {
 		double diff = kd * (error - lastError);
 		double prop = kp * error;
@@ -83,8 +121,10 @@ public class PICapacity extends Capacity {
 	}
 	
 	private Object newVm() {
-		return new Vm(nextId(), userId, 1000, 1, 4096, 10000, 1024, "XEN", 
+		Vm vm = new Vm(nextId(), userId, 1000, 1, 4096, 10000, 1024, "XEN", 
 				new CloudletSchedulerSpaceShared());
+		Log.printLine("VM.UID: " + vm.getUid());
+		return vm;
 	}
 
 }

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.Vm;
+import org.cloudbus.cloudsim.core.CloudSimTags;
 
 import br.usp.icmc.lasdpc.cloudsim.aux.Event;
 
@@ -33,9 +34,13 @@ public abstract class Effector {
 		set(cap, dem);
 		
 		for (Event e : cap) {
-			if (e.getData() instanceof Vm) {
+			if (e.getTag() == CloudSimTags.VM_CREATE_ACK) {
+			//if (e.getData() instanceof Vm) {
 				Vm vm = (Vm) e.getData();
-				mybroker.getMonitor().getVmManager().getVms().put(vm.getId(), vm);
+				//Log.printLine("Effector.update, vm: " + vm);
+				//mybroker.getMonitor().getVmManager().getVms().put(vm.getId(), vm);
+				mybroker.getMonitor().getVmManager().add(vm);
+				//Log.printLine(mybroker.getMonitor().getVmManager().getVms());
 			}
 		}
 		
@@ -43,6 +48,8 @@ public abstract class Effector {
 			Cloudlet cl = (Cloudlet) e.getData();
 			mybroker.getMonitor().getCloudletManager().submit(cl);;
 		}
+		
+		
 	}
 	
 	public OnlineBroker getMybroker() {

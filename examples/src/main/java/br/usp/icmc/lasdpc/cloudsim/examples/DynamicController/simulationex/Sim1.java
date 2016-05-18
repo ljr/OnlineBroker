@@ -38,7 +38,7 @@ public class Sim1 {
 		double lambdaAfter = 10;
 		long muBefore = 14;
 		long muAfter = 7;
-		double changeTime = 1000;
+		double changeTime = 40;
 		long seed = 12345;
 		int vmsAtStart = 7;
 		double kp = 8.5446;
@@ -76,17 +76,23 @@ public class Sim1 {
 		// In this example, it will have only one core.
 		List<Pe> peList = new ArrayList<Pe>();
 
-		int mips = 1000;
+		int mips = 1000*1000;
 
 		// 3. Create PEs and add these into a list.
 		peList.add(new Pe(0, new PeProvisionerSimple(mips))); // need to store Pe id and MIPS Rating
+		peList.add(new Pe(1, new PeProvisionerSimple(mips))); // need to store Pe id and MIPS Rating
+		peList.add(new Pe(2, new PeProvisionerSimple(mips))); // need to store Pe id and MIPS Rating
+		peList.add(new Pe(3, new PeProvisionerSimple(mips))); // need to store Pe id and MIPS Rating
+		peList.add(new Pe(4, new PeProvisionerSimple(mips))); // need to store Pe id and MIPS Rating
+		peList.add(new Pe(5, new PeProvisionerSimple(mips))); // need to store Pe id and MIPS Rating
+		peList.add(new Pe(6, new PeProvisionerSimple(mips))); // need to store Pe id and MIPS Rating
 
 		// 4. Create Host with its id and list of PEs and add them to the list
 		// of machines
 		int hostId = 0;
-		int ram = 2048; // host memory (MB)
-		long storage = 1000000; // host storage
-		int bw = 10000;
+		int ram = 20480*2; // host memory (MB)
+		long storage = 1000000*1000; // host storage
+		int bw = 10000*100;
 
 		hostList.add(
 			new Host(

@@ -1,7 +1,7 @@
 package br.usp.icmc.lasdpc.cloudsim.examples.DynamicController;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.cloudbus.cloudsim.Vm;
 import org.cloudbus.cloudsim.core.CloudSim;
@@ -10,31 +10,24 @@ import br.usp.icmc.lasdpc.cloudsim.Monitor;
 
 public class PerformanceMonitor extends Monitor {
 
-	public class MetaVm {
-		private Vm vm;
-		private double deadline;
-		
-		MetaVm(double deadline, Vm vm) {
-			this.deadline = deadline;
-			this.vm = vm;
-		}
-		
-		public Vm getVm() {
-			return vm;
-		}
-		
-		public double getDeadline() {
-			return deadline;
-		}
-	}
+
 
 	
 	private Map<Integer, MetaVm> bleeding;
 	private Map<Integer,MetaVm> starting;
+	private double changeTime;
+
+	public double getChangeTime() {
+		return changeTime;
+	}
+
+	public void setChangeTime(double changeTime) {
+		this.changeTime = changeTime;
+	}
 
 	public PerformanceMonitor() {
-		bleeding = new HashMap<Integer,MetaVm>();
-		starting = new HashMap<Integer,MetaVm>();
+		bleeding = new ConcurrentHashMap<Integer,MetaVm>();
+		starting = new ConcurrentHashMap<Integer,MetaVm>();
 	}
 
 	public Map<Integer, MetaVm> getBleeding() {
@@ -46,7 +39,7 @@ public class PerformanceMonitor extends Monitor {
 	}
 	
 	public boolean canReceiveCloudlets() {
-		return getVmManager().getCreated() > 0;
+		return getVmManager().getCreatedMap().size() > 0;
 	}
 	
 	public int howManyVmsInSystem() {
