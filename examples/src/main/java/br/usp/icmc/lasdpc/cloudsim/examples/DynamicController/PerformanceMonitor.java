@@ -1,21 +1,14 @@
 package br.usp.icmc.lasdpc.cloudsim.examples.DynamicController;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.cloudbus.cloudsim.Vm;
 import org.cloudbus.cloudsim.core.CloudSim;
 
 import br.usp.icmc.lasdpc.cloudsim.Monitor;
 
+
 public class PerformanceMonitor extends Monitor {
-
-
-
-	
-	private Map<Integer, MetaVm> bleeding;
-	private Map<Integer,MetaVm> starting;
 	private double changeTime;
+	private RealisticVmManager rvm;
 
 	public double getChangeTime() {
 		return changeTime;
@@ -25,25 +18,20 @@ public class PerformanceMonitor extends Monitor {
 		this.changeTime = changeTime;
 	}
 
+	public RealisticVmManager vmManager() {
+		return this.rvm;
+	}
+	
 	public PerformanceMonitor() {
-		bleeding = new ConcurrentHashMap<Integer,MetaVm>();
-		starting = new ConcurrentHashMap<Integer,MetaVm>();
+		this.rvm = new RealisticVmManager();
 	}
 
-	public Map<Integer, MetaVm> getBleeding() {
-		return bleeding;
-	}
-	
-	public Map<Integer, MetaVm> getStarting() {
-		return starting;
-	}
-	
 	public boolean canReceiveCloudlets() {
-		return getVmManager().getCreatedMap().size() > 0;
+		return vmManager().getRunning().size() > 0;
 	}
 	
-	public int howManyVmsInSystem() {
-		return getVmManager().getCreated() + starting.size() - bleeding.size();
+	public int vmsInSystem() {
+		return vmManager().getRunning().size();
 	}
 	
 	@Override
@@ -55,10 +43,10 @@ public class PerformanceMonitor extends Monitor {
 	private double getUtilization() {
 		double u = 0;
 		
-		for (Vm vm : getVmManager().getCreatedList()) {
+		for (Vm vm : rvm.getRunning().values()) {
 			u += vm.getCloudletScheduler().getTotalUtilizationOfCpu(CloudSim.clock());
 		}
 		
-		return u / getVmManager().getCreated();
+		return u / vmManager().getRunning().size();
 	}
 }

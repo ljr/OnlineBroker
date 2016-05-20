@@ -24,6 +24,7 @@ public class DatacenterBroker extends OnlineBroker {
 	private int targetDc;
 	private int targetVm;
 	
+	
 	public DatacenterBroker(String name, int sampleTime, Monitor monitor,
 			Effector effector, Demand demand, Capacity capacity)
 			throws Exception {
@@ -32,6 +33,7 @@ public class DatacenterBroker extends OnlineBroker {
 		cloudletReceivedList = new ArrayList<Cloudlet>();
 		targetDc = 0;
 		targetVm = 0;
+		getMonitor().add(DCMonitor.FIRST_SAMPLE, true);
 	}
 
 	public int getTargetDc() throws Exception {
@@ -43,11 +45,11 @@ public class DatacenterBroker extends OnlineBroker {
 	}
 	
 	public Vm getTargetVm() throws Exception {
-		if (getMonitor().getVmManager().getCreatedMap().isEmpty()) {
+		if (getMonitor().getVmManager().getRunning().isEmpty()) {
 			throw new Exception("No VM available.");
 		}
 		
-		int idx = targetVm++ % getMonitor().getVmManager().getCreated();
+		int idx = targetVm++ % getMonitor().getVmManager().getRunning().size();
 		
 		return getMonitor().getVmManager().getCreatedList().get(idx);
 	}
@@ -81,6 +83,7 @@ public class DatacenterBroker extends OnlineBroker {
 				if (getMonitor().allCloudletsProcessed()) {
 					finishExecution();
 				}
+				getMonitor().add(DCMonitor.FIRST_SAMPLE, false);
 				break;
 			default:
 				
@@ -90,18 +93,11 @@ public class DatacenterBroker extends OnlineBroker {
 	protected void processVmCreate(SimEvent ev) {
 		Ack ack = new Ack((int []) ev.getData());
 		
-		if (ack.succeed()) {
-			getMonitor().getVmManager().created(ack.getId());
-			Log.printConcatLine(CloudSim.clock(), ": ", getName(), 
-					": Creation of VM #", ack.getId(),
-					" OK in Datacenter #", ack.getDatacenterId());
-		} else {
-			getMonitor().getVmManager().failed(ack.getId());
-			Log.printConcatLine(CloudSim.clock(), ": ", getName(), 
-					": Creation of VM #", ack.getId(),
-					" failed in Datacenter #", ack.getDatacenterId());
-		}
-		
+		getMonitor().getVmManager().newToRunning(ack);
+		Log.printConcatLine(CloudSim.clock(), ": ", getName(), 
+				": Creation of VM #", ack.getId(), " ", 
+				ack.succeed()? "OK" : "FAILED",
+				" in Datacenter #", ack.getDatacenterId());
 	}
 	
 	

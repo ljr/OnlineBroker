@@ -8,6 +8,7 @@ import br.usp.icmc.lasdpc.cloudsim.Monitor;
 public class DCMonitor extends Monitor {
 	/** TODO: what is the best value for it? */
 	public static final int VMS_STATUS = 12345;
+	public static final int FIRST_SAMPLE = 12346;
 	
 	public boolean allVmsCreated() {
 		return getVmManager().allRequestedVmsDone();

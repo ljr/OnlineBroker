@@ -18,10 +18,14 @@ public class BatchCapacity extends Capacity {
 	@Override
 	public List<Event> update(Map<Integer, List<Object>> values) {
 		events.clear();
-			
-		for (Vm vm : mybroker.getMonitor().getVmManager().getSubmitList()) {
-			events.add(new Event(DELAY, TAG, vm));
+		
+		boolean firstSample = (boolean) values.get(DCMonitor.FIRST_SAMPLE).get(0);
+		if (firstSample) {
+			for (Vm vm : mybroker.getMonitor().getVmManager().getSubmitList()) {
+				events.add(new Event(DELAY, TAG, vm));
+			}			
 		}
+
 			
 		return events;
 	}

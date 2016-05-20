@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 
 import org.cloudbus.cloudsim.Vm;
 
+@Deprecated
 public class VmManager {
 
 	private Map<Integer, Vm> vms;

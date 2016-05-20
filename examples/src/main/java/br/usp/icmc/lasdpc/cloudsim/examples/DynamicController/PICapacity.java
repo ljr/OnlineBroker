@@ -57,11 +57,12 @@ public class PICapacity extends Capacity {
 		double error = setPoint - (double) values.get(Tags.UTILIZATION).get(0);
 		long howManyVms;
 		
+		
 		if (CloudSim.clock() == 0) {
 			howManyVms = vmsAtStart;
 		} else if (mon.canReceiveCloudlets()) {
 			// TODO: is howManyVmsInSystem returning the right value?
-			howManyVms = controller(error) - mon.howManyVmsInSystem();
+			howManyVms = controller(error) - mon.vmsInSystem();
 		} else {
 			howManyVms = 0;
 		}
@@ -76,7 +77,6 @@ public class PICapacity extends Capacity {
 			events.add(new Event(/*delay = */ 0, Tags.BLEED, -howManyVms));
 		}
 		
-		processAck(values.get(CloudSimTags.VM_DESTROY_ACK), CloudSimTags.VM_DESTROY_ACK);
 		processAck(values.get(CloudSimTags.VM_CREATE_ACK), CloudSimTags.VM_CREATE_ACK);
 		
 		return events;
@@ -89,16 +89,11 @@ public class PICapacity extends Capacity {
 		
 		for (Object ack : acks) {
 			Ack vmAck = (Ack) ack;
-			if (vmAck.getSuccess() == CloudSimTags.TRUE) {
+			if (vmAck.succeed()) {
 				if (tag == CloudSimTags.VM_CREATE_ACK) {
-					mon.getVmManager().created(vmAck.getId());
-					//Log.printLine(">>> Host: " + mon.getVmManager().getById(vmAck.getId()).getHost());
+					mon.vmManager().bootingToRunning(vmAck);
 				}
 				
-				if (tag == CloudSimTags.VM_DESTROY_ACK) {
-					mon.getVmManager().destroyed(vmAck.getId());
-				}
-
 				//Log.printLine(vmAck);
 			} else {
 				finishExecution();
@@ -121,8 +116,8 @@ public class PICapacity extends Capacity {
 	}
 	
 	private Object newVm() {
-		Vm vm = new Vm(nextId(), userId, 1000, 1, 4096, 10000, 1024, "XEN", 
-				new CloudletSchedulerSpaceShared());
+		Vm vm = mon.vmManager().newVm(nextId(), userId, 1000, 1, 4096, 10000, 
+				1024, "XEN", new CloudletSchedulerSpaceShared());
 		Log.printLine("VM.UID: " + vm.getUid());
 		return vm;
 	}

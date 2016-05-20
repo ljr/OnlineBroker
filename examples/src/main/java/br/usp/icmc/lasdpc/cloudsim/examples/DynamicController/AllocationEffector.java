@@ -21,8 +21,6 @@ public class AllocationEffector extends Effector {
 	
 	private int dcRR;
 	private int vmRR;
-	private Map<Integer, MetaVm> bleeding;
-	private Map<Integer, MetaVm> starting;
 	private PerformanceMonitor mon;
 	
 	public AllocationEffector() {
@@ -33,13 +31,11 @@ public class AllocationEffector extends Effector {
 	public void setMybroker(OnlineBroker mybroker) {
 		super.setMybroker(mybroker);
 		mon = (PerformanceMonitor) mybroker.getMonitor();
-		bleeding = mon.getBleeding();
-		starting = mon.getStarting();
 	}
 	
 	private List<Event> vmStateMachine(List<Event> cap) {
 		int ri = 0;
-		int []rem = new int[bleeding.size()];
+		int []rem = new int[mon.vmManager().getBleeding().size()];
 		
 		for (int i = 0; i < cap.size(); i++) {
 			Event e = cap.get(i);
@@ -50,11 +46,11 @@ public class AllocationEffector extends Effector {
 			case CloudSimTags.VM_CREATE_ACK:
 				Vm vm = (Vm) e.getData();
 				
-				if (bleeding.size() > 0) { // restore from bleeding
-					bleeding.remove(0);
+				if (mon.vmManager().hasBleeding()) { // restore from bleeding
+					mon.vmManager().bleedingToRunning(vm.getId());
 					rem[ri++] = i;
 				} else { // set as starting
-					starting.put(vm.getId(), new MetaVm(DEFAULT_VM_START_DELAY, vm));
+					mon.vmManager().newToBooting(vm.getId(), DEFAULT_VM_START_DELAY);
 					cap.get(i).setDelay(DEFAULT_VM_START_DELAY);
 				}
 				
@@ -62,11 +58,11 @@ public class AllocationEffector extends Effector {
 				
 			case Tags.BLEED:
 				long howManyVms = (long) e.getData(); // howManyVms ALWAYS will be a positive value bigger than zero.
-				long left = howManyVms - bleeding.size();
+				long left = howManyVms - mon.vmManager().getBleeding().size();
 				if (left > 0) {
 					for (int b = 0; b < left; b++) {
-						if (starting.size() >0 ) {
-							starting.remove(0);
+						if (mon.vmManager().hasBooting()) {
+							mon.vmManager().bo
 							rem[ri++] = i;
 						} else { // set to bleed
 							vm = getNextToBleed();

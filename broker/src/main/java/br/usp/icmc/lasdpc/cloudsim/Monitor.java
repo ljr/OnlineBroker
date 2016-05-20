@@ -8,19 +8,19 @@ import java.util.Map;
 
 import org.cloudbus.cloudsim.Cloudlet;
 
+import br.usp.icmc.lasdpc.cloudsim.aux.BasicVmManager;
 import br.usp.icmc.lasdpc.cloudsim.aux.CloudletManager;
-import br.usp.icmc.lasdpc.cloudsim.aux.VmManager;
 
 
 public abstract class Monitor {
 	
 	protected Map<Integer, List<Object>> values;
-	protected VmManager vmManager;
+	protected BasicVmManager vmManager;
 	protected CloudletManager cloudletManager;
 
 	public Monitor() {
 		values = new HashMap<Integer, List<Object>>();
-		vmManager = new VmManager();
+		vmManager = new BasicVmManager();
 		cloudletManager = new CloudletManager();
 	}
 	
@@ -48,11 +48,11 @@ public abstract class Monitor {
 		return values.get(tag);
 	}
 
-	public VmManager getVmManager() {
+	public BasicVmManager getVmManager() {
 		return vmManager;
 	}
 
-	public void setVmManager(VmManager vmList) {
+	public void setVmManager(BasicVmManager vmList) {
 		this.vmManager = vmList;
 	}
 

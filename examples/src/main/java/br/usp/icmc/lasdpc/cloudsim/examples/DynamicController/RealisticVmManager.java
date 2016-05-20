@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.cloudbus.cloudsim.Vm;
-import org.cloudbus.cloudsim.core.CloudSimTags;
 
 import br.usp.icmc.lasdpc.cloudsim.aux.Ack;
+import br.usp.icmc.lasdpc.cloudsim.aux.BaseVmManager;
 
 /**
  * Implements a realistic Virtual Machine (VM) state machine. When a new VM is
@@ -30,12 +30,17 @@ import br.usp.icmc.lasdpc.cloudsim.aux.Ack;
 public class RealisticVmManager extends BaseVmManager {
 
 	/**
-	 * VMs in booting state
+	 * VMs in <tt>booting</tt> state.
 	 */
 	private Map<Integer, MetaVm> booting;
 	
 	/**
-	 * VMs in bleeding state
+	 * VMs <tt>canceled</tt> during the <tt>booting</tt> state.
+	 */
+	private Map<Integer, MetaVm> canceled;
+	
+	/**
+	 * VMs in <tt>bleeding</tt> state.
 	 */
 	private Map<Integer, MetaVm> bleeding;
 
@@ -45,16 +50,26 @@ public class RealisticVmManager extends BaseVmManager {
 	public RealisticVmManager() {
 		booting = new HashMap<Integer, MetaVm>();
 		bleeding = new HashMap<Integer, MetaVm>();
+		canceled = new HashMap<Integer, MetaVm>();
 	}
 	
 	/**
-	 * Set the new Vm as booting
+	 * Set the new Vm as <tt>booting</tt>.
 	 * 
 	 * @param vmId
 	 * @param bootTime
 	 */
 	public void newToBooting(int vmId, double bootTime) {
 		booting.put(vmId, new MetaVm(bootTime, vms.get(vmId)));
+	}
+	
+	/**
+	 * Set the Vm into <tt>canceled</tt> state. The Vm was booting and for some
+	 * reason it need to be canceled.
+	 * @param vmId
+	 */
+	public void bootingToCanceled(int vmId) {
+		canceled.put(vmId, booting.remove(vmId));
 	}
 	
 	/**
@@ -68,7 +83,7 @@ public class RealisticVmManager extends BaseVmManager {
 		List<Vm> result = new ArrayList<Vm>();
 		
 		for (MetaVm vm : booting.values()) {
-			if (vm.getDeadline() >= clock) {
+			if (clock >= vm.getDeadline()) {
 				result.add(vm.getVm());
 			}
 		}
@@ -85,7 +100,7 @@ public class RealisticVmManager extends BaseVmManager {
 	 * @param ack
 	 */
 	public void bootingToRunning(Ack ack) {
-		if (ack.getSuccess() == CloudSimTags.TRUE) {
+		if (ack.succeed()) {
 			running.put(ack.getId(), booting.remove(ack.getId()).getVm());
 		} else {
 			failures.put(ack.getId(), booting.remove(ack.getId()).getVm());
@@ -109,17 +124,56 @@ public class RealisticVmManager extends BaseVmManager {
 		running.put(vmId, bleeding.remove(vmId).getVm());
 	}
 	
+	public void bleedingToRunning() {
+		double min = Double.MAX_VALUE;
+		int id = -1;
+		
+		for (MetaVm mvm : bleeding.values()) {
+			// TODO: how this works?
+			double v = mvm.getVm().getCurrentRequestedTotalMips();
+			
+			if (v <= min) {
+				min = v;
+				id = mvm.getId();
+			}
+		}
+		
+		bleedingToRunning(id);
+	}
+	
 	/**
 	 * Given a certain instant of time, set those <tt>Vm</tt>s that already 
 	 * finished the bleed into <tt>destroyed</tt> state. 
 	 * @param clock
 	 */
-	public void bleedingToDestroyed(int clock) {
+	public void bleedingToDestroyed(double clock) {
+		List<Vm> toDestroy = new ArrayList<>();
+		
 		for (MetaVm vm : bleeding.values()) {
-			if (vm.getDeadline() >= clock) {
-				destroyed.put(vm.getVm().getId(), bleeding.remove(vm.getVm().getId()).getVm());
+			if (clock >= vm.getDeadline()) {
+				toDestroy.add(vm.getVm());
+				// The following code launches a ConcurrentModificationException
+				// due the fact we are iterating on bleeding and in the same
+				// loop changing its structure.
+				//destroyed.put(vm.getId(), bleeding.remove(vm.getId()).getVm());
 			}
 		}
+		
+		for (Vm vm : toDestroy) {
+			destroyed.put(vm.getId(), bleeding.remove(vm.getId()).getVm());
+		}
+	}
+	
+	public boolean hasBleeding() {
+		return bleeding.size() > 0;
+	}
+	
+	public boolean hasBooting() {
+		return booting.size() > 0;
+	}
+	
+	public int vmsInSystem() {
+		return booting.size() + running.size();
 	}
 
 	public Map<Integer, MetaVm> getBooting() {

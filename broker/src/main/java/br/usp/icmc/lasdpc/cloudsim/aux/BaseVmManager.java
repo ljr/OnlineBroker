@@ -1,4 +1,4 @@
-package br.usp.icmc.lasdpc.cloudsim.examples.DynamicController;
+package br.usp.icmc.lasdpc.cloudsim.aux;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -58,7 +58,7 @@ public abstract class BaseVmManager {
 	 * 
 	 * @param vm 
 	 */
-	private void create(Vm vm) {
+	protected void create(Vm vm) {
 		vms.put(vm.getId(), vm);
 	}
 	
