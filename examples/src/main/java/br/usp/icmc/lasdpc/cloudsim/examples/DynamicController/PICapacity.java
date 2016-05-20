@@ -91,7 +91,7 @@ public class PICapacity extends Capacity {
 			Ack vmAck = (Ack) ack;
 			if (vmAck.succeed()) {
 				if (tag == CloudSimTags.VM_CREATE_ACK) {
-					mon.vmManager().bootingToRunning(vmAck);
+					mon.getVmManager().bootingToRunning(vmAck);
 				}
 				
 				//Log.printLine(vmAck);
@@ -115,9 +115,17 @@ public class PICapacity extends Capacity {
 		return Math.round(Math.floor(prop + integral + diff));
 	}
 	
-	private Object newVm() {
-		Vm vm = mon.vmManager().newVm(nextId(), userId, 1000, 1, 4096, 10000, 
-				1024, "XEN", new CloudletSchedulerSpaceShared());
+	private Vm newVm() {
+		Vm vm = null;
+
+		try {
+			vm = mon.getVmManager().newVm(nextId(), userId, 1000, 1, 4096, 10000, 
+					1024, "XEN", new CloudletSchedulerSpaceShared());
+		} catch (Exception e) {
+			Log.printLine(e.getMessage());
+			finishExecution();
+		}
+		
 		Log.printLine("VM.UID: " + vm.getUid());
 		return vm;
 	}

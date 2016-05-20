@@ -1,4 +1,4 @@
-package br.usp.icmc.lasdpc.cloudsim.examples.DynamicController;
+package br.usp.icmc.lasdpc.cloudsim.aux;
 
 import org.cloudbus.cloudsim.Vm;
 

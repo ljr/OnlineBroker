@@ -4,11 +4,12 @@ import org.cloudbus.cloudsim.Vm;
 import org.cloudbus.cloudsim.core.CloudSim;
 
 import br.usp.icmc.lasdpc.cloudsim.Monitor;
+import br.usp.icmc.lasdpc.cloudsim.aux.VmManager;
 
 
 public class PerformanceMonitor extends Monitor {
 	private double changeTime;
-	private RealisticVmManager rvm;
+	private VmManager rvm;
 
 	public double getChangeTime() {
 		return changeTime;
@@ -18,20 +19,12 @@ public class PerformanceMonitor extends Monitor {
 		this.changeTime = changeTime;
 	}
 
-	public RealisticVmManager vmManager() {
-		return this.rvm;
-	}
-	
-	public PerformanceMonitor() {
-		this.rvm = new RealisticVmManager();
-	}
-
 	public boolean canReceiveCloudlets() {
-		return vmManager().getRunning().size() > 0;
+		return getVmManager().getRunning().size() > 0;
 	}
 	
 	public int vmsInSystem() {
-		return vmManager().getRunning().size();
+		return getVmManager().getRunning().size();
 	}
 	
 	@Override
@@ -47,6 +40,6 @@ public class PerformanceMonitor extends Monitor {
 			u += vm.getCloudletScheduler().getTotalUtilizationOfCpu(CloudSim.clock());
 		}
 		
-		return u / vmManager().getRunning().size();
+		return u / getVmManager().getRunning().size();
 	}
 }

@@ -13,6 +13,7 @@ import org.cloudbus.cloudsim.core.CloudSimTags;
 import br.usp.icmc.lasdpc.cloudsim.Effector;
 import br.usp.icmc.lasdpc.cloudsim.OnlineBroker;
 import br.usp.icmc.lasdpc.cloudsim.aux.Event;
+import br.usp.icmc.lasdpc.cloudsim.aux.MetaVm;
 
 public class AllocationEffector extends Effector {
 
@@ -35,7 +36,7 @@ public class AllocationEffector extends Effector {
 	
 	private List<Event> vmStateMachine(List<Event> cap) {
 		int ri = 0;
-		int []rem = new int[mon.vmManager().getBleeding().size()];
+		int []rem = new int[mon.getVmManager().getBleeding().size()];
 		
 		for (int i = 0; i < cap.size(); i++) {
 			Event e = cap.get(i);
@@ -46,11 +47,11 @@ public class AllocationEffector extends Effector {
 			case CloudSimTags.VM_CREATE_ACK:
 				Vm vm = (Vm) e.getData();
 				
-				if (mon.vmManager().hasBleeding()) { // restore from bleeding
-					mon.vmManager().bleedingToRunning(vm.getId());
+				if (mon.getVmManager().hasBleeding()) { // restore from bleeding
+					mon.getVmManager().bleedingToRunning(vm.getId());
 					rem[ri++] = i;
 				} else { // set as starting
-					mon.vmManager().newToBooting(vm.getId(), DEFAULT_VM_START_DELAY);
+					mon.getVmManager().newToBooting(vm.getId(), DEFAULT_VM_START_DELAY);
 					cap.get(i).setDelay(DEFAULT_VM_START_DELAY);
 				}
 				
@@ -58,16 +59,16 @@ public class AllocationEffector extends Effector {
 				
 			case Tags.BLEED:
 				long howManyVms = (long) e.getData(); // howManyVms ALWAYS will be a positive value bigger than zero.
-				long left = howManyVms - mon.vmManager().getBleeding().size();
+				long left = howManyVms - mon.getVmManager().getBleeding().size();
 				if (left > 0) {
 					for (int b = 0; b < left; b++) {
-						if (mon.vmManager().hasBooting()) {
-							mon.vmManager().bo
+						if (mon.getVmManager().hasBooting()) {
+							mon.getVmManager().bootingToCanceled(vmId)
 							rem[ri++] = i;
 						} else { // set to bleed
 							vm = getNextToBleed();
 							double howLongToFinish = vm.getCurrentRequestedTotalMips()/60; 
-							bleeding.put(vm.getId(), new MetaVm(howLongToFinish, vm));
+							mon.getVmManager().getBleeding().put(vm.getId(), new MetaVm(howLongToFinish, vm));
 							//cap.get(i).setDelay(howLongToFinish);
 							//cap.get(i).setTag(CloudSimTags.VM_DESTROY_ACK);
 						}
