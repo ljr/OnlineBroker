@@ -2,13 +2,9 @@ package br.usp.icmc.lasdpc.cloudsim.aux;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeSet;
 
 import org.cloudbus.cloudsim.CloudletScheduler;
 import org.cloudbus.cloudsim.Vm;
@@ -84,6 +80,8 @@ public class VmManager {
 	 */
 	private Map<Integer, MetaVm> booting;
 	
+	private List<MetaVm> bootingList;
+	
 	/**
 	 * VMs <tt>canceled</tt> during the <tt>booting</tt> state.
 	 */
@@ -104,6 +102,7 @@ public class VmManager {
 		this.running = new HashMap<Integer, Vm>();
 		this.destroyed = new HashMap<Integer, Vm>();
 		this.booting = new HashMap<Integer, MetaVm>();
+		this.bootingList = new ArrayList<MetaVm>();
 		this.canceled = new HashMap<Integer, MetaVm>();
 		this.bleeding = new HashMap<Integer, MetaVm>();
 	}
@@ -164,7 +163,9 @@ public class VmManager {
 			return false;
 		}
 			
-		booting.put(vmId, new MetaVm(bootTime, vms.get(vmId)));
+		MetaVm mvm = new MetaVm(bootTime, vms.get(vmId));
+		bootingList.add(mvm);
+		booting.put(vmId, mvm);
 		return true;
 	}
 	
@@ -178,26 +179,14 @@ public class VmManager {
 			return false;
 		}
 		
-		List<Integer> toCancel = new ArrayList<Integer>();
-		List<MetaVm> values = new ArrayList<MetaVm>(booting.values());
-		
-		
-		int i = 0;
-		for (MetaVm mvm : booting.values()) {
-			
-			if (i++ > howMany) {
-				break;
+		int s = booting.size();
+		for (int i = s - 1; i >= s - howMany; i--) {
+			if (!booting.isEmpty()) {
+				MetaVm mvm = bootingList.remove(i);
+				canceled.put(mvm.getId(), booting.remove(mvm.getId()));	
 			}
 		}
 		
-		
-		for (Iterator<Entry<Integer, MetaVm>> entries = booting.entrySet().iterator(); 
-				i < howMany; i++) {
-			Entry<Integer, MetaVm> e = entries.next();
-			int vmId = e.getValue().getId();
-			canceled.put(vmId, booting.remove(vmId));
-		}
-
 		return true;
 	}
 	
@@ -211,7 +200,7 @@ public class VmManager {
 	public List<Vm> vmsToBeCreated(double clock) {
 		List<Vm> result = new ArrayList<Vm>();
 		
-		for (MetaVm vm : booting.values()) {
+		for (MetaVm vm : bootingList) {
 			if (clock >= vm.getDeadline()) {
 				result.add(vm.getVm());
 			}
@@ -234,10 +223,12 @@ public class VmManager {
 			return false;
 		}
 		
+		MetaVm mvm = booting.remove(ack.getId());
+		bootingList.remove(bootingList.indexOf(mvm));
 		if (ack.succeed()) {
-			running.put(ack.getId(), booting.remove(ack.getId()).getVm());
+			running.put(ack.getId(), mvm.getVm());
 		} else {
-			failures.put(ack.getId(), booting.remove(ack.getId()).getVm());
+			failures.put(ack.getId(), mvm.getVm());
 		}
 		
 		return true;
@@ -336,8 +327,6 @@ public class VmManager {
 		return booting.size() + running.size();
 	}
 
-	
-	
 	/**
 	 * Try to set VM to running state. The VM will be added to running or 
 	 * failures list, as the value of ack.getSuccess() if CloudSimTags.TRUE or

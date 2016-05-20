@@ -116,10 +116,10 @@ public class VmManagerTest extends TestCase {
 		assertEquals(0, vmm.getBleeding().size());
 		
 		// TO CANCELED
-		if (!vmm.bootingToCanceled(toBoot - 1)) {
-			fail("Could not cancel the boot of vmId: " + (toBoot - 1));
+		if (!vmm.bootingToCanceled(toCanceled)) {
+			fail("Could not cancel this amount of Vms: " + toCanceled);
 		}
-		if (vmm.bootingToCanceled(toBoot - 1)) {
+		if (vmm.bootingToCanceled(0)) {
 			fail("Must refuse to cancel Vm boot of vmId: " + (toBoot - 1));
 		}
 		// STATE: {vms: 10, failures:0, running: 0, destroyed: 0, booting: 8, canceled: 1, bleeding: 0}

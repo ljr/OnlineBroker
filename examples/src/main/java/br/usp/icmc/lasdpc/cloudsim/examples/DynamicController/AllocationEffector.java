@@ -59,6 +59,8 @@ public class AllocationEffector extends Effector {
 				
 			case Tags.BLEED:
 				long howManyVms = (long) e.getData(); // howManyVms ALWAYS will be a positive value bigger than zero.
+
+				/*
 				long left = howManyVms - mon.getVmManager().getBleeding().size();
 				if (left > 0) {
 					for (int b = 0; b < left; b++) {
@@ -77,7 +79,7 @@ public class AllocationEffector extends Effector {
 					Log.printLine("Invalid transition. `howMany' has assumed a negative value. This MUST BE a VM_CREATE transition. left: " + left);
 					finishExecution();
 				}
-				
+				*/				
 				break;
 
 			default:
