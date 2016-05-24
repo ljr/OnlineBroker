@@ -7,8 +7,13 @@ public class MetaVm {
 	private Vm vm;
 	private double deadline;
 	
-	MetaVm(double deadline, Vm vm) {
+	MetaVm(double deadline, Vm vm) throws Exception {
 		this.deadline = deadline;
+		
+		if (vm == null) {
+			throw new Exception("Vm cannot be null.");
+		}
+		
 		this.vm = vm;
 		this.id = vm.getId();
 	}

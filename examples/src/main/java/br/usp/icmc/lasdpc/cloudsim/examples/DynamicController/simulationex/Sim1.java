@@ -31,27 +31,33 @@ public class Sim1 {
 		Calendar calendar = Calendar.getInstance();
 		boolean trace_flag = false;
 		CloudSim.init(num_user, calendar, trace_flag);
-		Datacenter datacenter0 = createDatacenter("Datacenter_0");
+		
+		int numberOfHosts = 20;
+		int npesPerHost = 16;
+		Datacenter datacenter0 = createDatacenter("Datacenter_0", numberOfHosts, npesPerHost);
 
 		
 		double lambdaBefore = 20;
 		double lambdaAfter = 10;
 		long muBefore = 14;
 		long muAfter = 7;
-		double changeTime = 40;
+		double changeTime = 400;
 		long seed = 12345;
 		int vmsAtStart = 7;
-		double kp = 8.5446;
-		double ki = -0.85535;
+		double setPoint = .7;
+		double kp = 18.5446;
+		double ki = -0.085535;
 		double kd = 0;
 		
+
 		OnlineBroker ob = new OnlineBroker("Broker", 10, 
 				new PerformanceMonitor(), 
 				new AllocationEffector(), 
 				new StepDemand(seed, StepDemand.newWorkload(lambdaBefore, 
 						lambdaAfter, muBefore, muAfter, changeTime)), 
-				new PICapacity(vmsAtStart, .7, kp, ki, kd)
+				new PICapacity(vmsAtStart, setPoint, kp, ki, kd)
 		);
+		
 		
 		CloudSim.startSimulation();
 		CloudSim.stopSimulation();
@@ -65,8 +71,7 @@ public class Sim1 {
 	 *
 	 * @return the datacenter
 	 */
-	private static Datacenter createDatacenter(String name) {
-
+	private static Datacenter createDatacenter(String name, int nhosts, int npes) {
 		// Here are the steps needed to create a PowerDatacenter:
 		// 1. We need to create a list to store
 		// our machine
@@ -74,18 +79,7 @@ public class Sim1 {
 
 		// 2. A Machine contains one or more PEs or CPUs/Cores.
 		// In this example, it will have only one core.
-		List<Pe> peList = new ArrayList<Pe>();
 
-		int mips = 1000*1000;
-
-		// 3. Create PEs and add these into a list.
-		peList.add(new Pe(0, new PeProvisionerSimple(mips))); // need to store Pe id and MIPS Rating
-		peList.add(new Pe(1, new PeProvisionerSimple(mips))); // need to store Pe id and MIPS Rating
-		peList.add(new Pe(2, new PeProvisionerSimple(mips))); // need to store Pe id and MIPS Rating
-		peList.add(new Pe(3, new PeProvisionerSimple(mips))); // need to store Pe id and MIPS Rating
-		peList.add(new Pe(4, new PeProvisionerSimple(mips))); // need to store Pe id and MIPS Rating
-		peList.add(new Pe(5, new PeProvisionerSimple(mips))); // need to store Pe id and MIPS Rating
-		peList.add(new Pe(6, new PeProvisionerSimple(mips))); // need to store Pe id and MIPS Rating
 
 		// 4. Create Host with its id and list of PEs and add them to the list
 		// of machines
@@ -93,17 +87,27 @@ public class Sim1 {
 		int ram = 20480*2; // host memory (MB)
 		long storage = 1000000*1000; // host storage
 		int bw = 10000*100;
+		int mips = 1000*1000;
 
-		hostList.add(
-			new Host(
-				hostId,
-				new RamProvisionerSimple(ram),
-				new BwProvisionerSimple(bw),
-				storage,
-				peList,
-				new VmSchedulerTimeShared(peList)
-			)
-		); // This is our machine
+		for (int i = 0; i < nhosts; i++) {
+			List<Pe> peList = new ArrayList<Pe>();
+			
+			for (int pe = 0; pe < npes; pe++) {
+				// 3. Create PEs and add these into a list.
+				peList.add(new Pe(i * npes + pe, new PeProvisionerSimple(mips))); // need to store Pe id and MIPS Rating
+			}
+			
+			hostList.add(
+					new Host(
+						hostId + i,
+						new RamProvisionerSimple(ram),
+						new BwProvisionerSimple(bw),
+						storage,
+						peList,
+						new VmSchedulerTimeShared(peList)
+					)
+				); // This is our machine
+		}
 
 		// 5. Create a DatacenterCharacteristics object that stores the
 		// properties of a data center: architecture, OS, list of

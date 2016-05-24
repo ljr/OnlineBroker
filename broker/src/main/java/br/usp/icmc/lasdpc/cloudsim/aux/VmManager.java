@@ -5,8 +5,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.cloudbus.cloudsim.CloudletScheduler;
+import org.cloudbus.cloudsim.Log;
 import org.cloudbus.cloudsim.Vm;
 
 
@@ -78,9 +80,7 @@ public class VmManager {
 	/**
 	 * VMs in <tt>booting</tt> state.
 	 */
-	private Map<Integer, MetaVm> booting;
-	
-	private List<MetaVm> bootingList;
+	private TreeMap<Integer, MetaVm> booting;
 	
 	/**
 	 * VMs <tt>canceled</tt> during the <tt>booting</tt> state.
@@ -101,8 +101,7 @@ public class VmManager {
 		this.failures = new HashMap<Integer, Vm>();
 		this.running = new HashMap<Integer, Vm>();
 		this.destroyed = new HashMap<Integer, Vm>();
-		this.booting = new HashMap<Integer, MetaVm>();
-		this.bootingList = new ArrayList<MetaVm>();
+		this.booting = new TreeMap<Integer, MetaVm>();
 		this.canceled = new HashMap<Integer, MetaVm>();
 		this.bleeding = new HashMap<Integer, MetaVm>();
 	}
@@ -114,12 +113,7 @@ public class VmManager {
 	 * @return 
 	 */
 	protected boolean create(Vm vm) {
-		if (vms.containsKey(vm.getId())) {
-			return false;
-		}
-		
-		vms.put(vm.getId(), vm);
-		return true;
+		return vms.put(vm.getId(), vm) == null;
 	}
 	
 	/**
@@ -163,10 +157,11 @@ public class VmManager {
 			return false;
 		}
 			
-		MetaVm mvm = new MetaVm(bootTime, vms.get(vmId));
-		bootingList.add(mvm);
-		booting.put(vmId, mvm);
-		return true;
+		try {
+			return booting.put(vmId, new MetaVm(bootTime, vms.get(vmId))) == null;
+		} catch (Exception e) {
+			return false;
+		}
 	}
 	
 	/**
@@ -174,7 +169,7 @@ public class VmManager {
 	 * reason it need to be canceled.
 	 * @param howMany
 	 */
-	public boolean bootingToCanceled(int howMany) {
+	public boolean bootingToCanceled(long howMany) {
 		if (howMany < 1) {
 			return false;
 		}
@@ -182,8 +177,8 @@ public class VmManager {
 		int s = booting.size();
 		for (int i = s - 1; i >= s - howMany; i--) {
 			if (!booting.isEmpty()) {
-				MetaVm mvm = bootingList.remove(i);
-				canceled.put(mvm.getId(), booting.remove(mvm.getId()));	
+				Integer vmId = booting.lastKey();
+				canceled.put(vmId, booting.remove(vmId));	
 			}
 		}
 		
@@ -200,7 +195,7 @@ public class VmManager {
 	public List<Vm> vmsToBeCreated(double clock) {
 		List<Vm> result = new ArrayList<Vm>();
 		
-		for (MetaVm vm : bootingList) {
+		for (MetaVm vm : booting.values()) {
 			if (clock >= vm.getDeadline()) {
 				result.add(vm.getVm());
 			}
@@ -224,14 +219,11 @@ public class VmManager {
 		}
 		
 		MetaVm mvm = booting.remove(ack.getId());
-		bootingList.remove(bootingList.indexOf(mvm));
 		if (ack.succeed()) {
-			running.put(ack.getId(), mvm.getVm());
+			return running.put(ack.getId(), mvm.getVm()) == null;
 		} else {
-			failures.put(ack.getId(), mvm.getVm());
+			return failures.put(ack.getId(), mvm.getVm()) == null;
 		}
-		
-		return true;
 	}
 	
 	/**
@@ -241,13 +233,81 @@ public class VmManager {
 	 * @return
 	 */
 	public boolean runningToBleeding(int vmId, double bleedTime) {
-		if (!running.containsKey(vmId)) {
+		try {
+			return runningToBleeding(new MetaVm(bleedTime, running.get(vmId)));
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+	/**
+	 * Set a <tt>MetaVm</tt> into <tt>bleeding</tt> state. It is mainly used by
+	 * runningToBleeding(howMany).
+	 * @param mvm
+	 * @return
+	 */
+	protected boolean runningToBleeding(MetaVm mvm) {
+		if (!running.containsKey(mvm.getId())) {
 			return false;
 		}
 		
-		bleeding.put(vmId, new MetaVm(bleedTime, running.remove(vmId)));
+		running.remove(mvm.getId());
+		return bleeding.put(mvm.getId(), mvm) == null;
+	}
+	
+	/**
+	 * Set an arbitrary number of <tt>Vm</tt>s into <tt>bleeding</tt> state.
+	 * @param howMany
+	 * @return
+	 * @see getNextBleed
+	 */
+	public int runningToBleeding(long howMany) {
+		int r = -1;
 		
-		return true;
+		if (howMany < 1) {
+			return r;
+		} else {
+			r = 0;
+		}
+		
+		for (int i = 0; i < howMany; i++) {
+			if (runningToBleeding(getNextToBleed())) {
+				r++;
+			}
+		}
+		
+		return r;
+	}
+	
+	/**
+	 * Choose the idlest <tt>Vm</tt> to bleed.
+	 * @return
+	 */
+	protected MetaVm getNextToBleed() {
+		Vm toBleed = null;
+		double min = Double.MAX_VALUE;
+		double bleedTime = Double.MIN_VALUE;
+		
+		for (Vm vm : running.values()) {
+			double vmLoad = vm.getCurrentRequestedTotalMips(); 
+			if (vmLoad <= min) {
+				min = vmLoad;
+				bleedTime = vmLoad;
+				toBleed = vm;
+			}
+		}
+		
+		if (toBleed == null) {
+			toBleed = (new ArrayList<Vm>(running.values())).get(0);
+			bleedTime = toBleed.getCurrentRequestedTotalMips();
+		}
+		
+		try {
+			return new MetaVm(bleedTime, toBleed);
+		} catch (Exception e) {
+			Log.printLine("ERROR: VmManager.getNextToBleed(): it is not suppose to this exception occurs.");
+			return null;
+		}
 	}
 	
 	/**
@@ -260,31 +320,52 @@ public class VmManager {
 			return false;
 		}
 		
-		running.put(vmId, bleeding.remove(vmId).getVm());
-		
-		return true;
+		return running.put(vmId, bleeding.remove(vmId).getVm()) == null;
 	}
 	
 	/**
-	 * Choose the more idle <tt>Vm</tt> to remove from bleeding to running.
+	 * Choose the idlest <tt>Vm</tt> to remove from bleeding to running.
 	 * 
 	 * @return
 	 */
-	public boolean bleedingToRunning() {
-		double min = Double.MAX_VALUE;
-		int id = -1;
-		
-		for (MetaVm mvm : bleeding.values()) {
-			// TODO: how this works?
-			double v = mvm.getVm().getCurrentRequestedTotalMips();
+	public boolean idlestBleeding() {
+			double min = Double.MAX_VALUE;
+			int id = -1;
 			
-			if (v <= min) {
-				min = v;
-				id = mvm.getId();
+			for (MetaVm mvm : bleeding.values()) {
+				// TODO: how this works?
+				double v = mvm.getVm().getCurrentRequestedTotalMips();
+				
+				if (v <= min) {
+					min = v;
+					id = mvm.getId();
+				}
 			}
+			
+			return bleedingToRunning(id);
+	}
+	
+	/**
+	 * Turn the `howMany' idlest <tt>Vm</tt>s into <tt>running</tt> state again.
+	 * @param howMany
+	 * @return The number of <tt>Vm</tt>s put in <tt>running</tt>.
+	 */
+	public long bleedingToRunning(long howMany) {
+		long r = -1;
+		
+		if (howMany < 1) {
+			return r;
+		} else {
+			r = 0;
 		}
 		
-		return bleedingToRunning(id);
+		for (int i = 0; i < howMany; i++) {
+			if (idlestBleeding()) {
+				r++;
+			}
+		}
+			
+		return r;
 	}
 	
 	/**
@@ -339,12 +420,10 @@ public class VmManager {
 		}
 		
 		if (ack.succeed()) {
-			running.put(ack.getId(), vms.get(ack.getId()));
+			return running.put(ack.getId(), vms.get(ack.getId())) == null;
 		} else {
-			failures.put(ack.getId(), vms.get(ack.getId()));
+			return failures.put(ack.getId(), vms.get(ack.getId())) == null;
 		}
-		
-		return true;
 	}
 	
 	/**
@@ -356,9 +435,8 @@ public class VmManager {
 			return false;
 		}
 		
-		destroyed.put(vmId, running.remove(vmId));
 		
-		return true;
+		return destroyed.put(vmId, running.remove(vmId)) == null;
 	}
 	
 	
@@ -481,7 +559,7 @@ public class VmManager {
 		return booting;
 	}
 
-	public void setBooting(Map<Integer, MetaVm> booting) {
+	public void setBooting(TreeMap<Integer, MetaVm> booting) {
 		this.booting = booting;
 	}
 

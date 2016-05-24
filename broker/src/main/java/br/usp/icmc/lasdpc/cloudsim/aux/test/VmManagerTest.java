@@ -164,11 +164,17 @@ public class VmManagerTest extends TestCase {
 		
 		// RUNNING TO BLEEDING
 		// ALL RUNNING VM TO BLEEDING
+		
 		for (int i = 0; i < toRun; i++) {
 			if (!vmm.runningToBleeding(i, bleedTime)) {
 				fail("Could not put a running Vm into bleed.");
 			}
 		}
+		/* TODO: test it.
+		if (vmm.runningToBleeding(toRun) != toRun) {
+			fail("Error: could not put " + toRun + " Vms in bleeding state");
+		}
+		*/
 		if (vmm.runningToBleeding(0, bleedTime)) {
 			fail("Error: put a bleeding Vm from running to bleeding.");
 		}

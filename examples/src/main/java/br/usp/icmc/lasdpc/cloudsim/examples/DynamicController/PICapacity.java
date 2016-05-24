@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.cloudbus.cloudsim.CloudletSchedulerSpaceShared;
 import org.cloudbus.cloudsim.Log;
-import org.cloudbus.cloudsim.Vm;
 import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.core.CloudSimTags;
 
@@ -74,30 +73,30 @@ public class PICapacity extends Capacity {
 						newVm()));
 			}
 		} else if (howManyVms < 0) {
-			events.add(new Event(/*delay = */ 0, Tags.BLEED, -howManyVms));
+			events.add(new Event(/*delay = */ 0, Tags.DESTROY, -howManyVms));
 		}
 		
-		processAck(values.get(CloudSimTags.VM_CREATE_ACK), CloudSimTags.VM_CREATE_ACK);
+		processAck(values, CloudSimTags.VM_CREATE_ACK);
 		
 		return events;
 	}
 	
-	private void processAck(List<Object> acks, int tag) {
+	private void processAck(Map<Integer, List<Object>> values, int tag) {
+		
+		List<Object> acks = values.get(tag);
 		if (acks == null) {
 			return;
 		}
 		
+		
 		for (Object ack : acks) {
 			Ack vmAck = (Ack) ack;
-			if (vmAck.succeed()) {
-				if (tag == CloudSimTags.VM_CREATE_ACK) {
-					mon.getVmManager().bootingToRunning(vmAck);
-				}
-				
-				//Log.printLine(vmAck);
-			} else {
-				finishExecution();
+			if (tag == CloudSimTags.VM_CREATE_ACK) {
+				mon.getVmManager().bootingToRunning(vmAck);
+//				Log.printLine(">>>> VM_CREATE_ACK received running: " + mon.getVmManager().getRunning().size());
 			}
+				
+			//Log.printLine(vmAck);
 		}
 	}
 
@@ -115,19 +114,20 @@ public class PICapacity extends Capacity {
 		return Math.round(Math.floor(prop + integral + diff));
 	}
 	
-	private Vm newVm() {
-		Vm vm = null;
+	private Integer newVm() {
+		Integer vmId = -1;
 
 		try {
-			vm = mon.getVmManager().newVm(nextId(), userId, 1000, 1, 4096, 10000, 
-					1024, "XEN", new CloudletSchedulerSpaceShared());
+			vmId = (mon.getVmManager().newVm(nextId(), userId, 1000, 1, 4096, 
+					10000, 1024, "XEN", new CloudletSchedulerSpaceShared()))
+					.getId();
 		} catch (Exception e) {
 			Log.printLine(e.getMessage());
 			finishExecution();
 		}
 		
-		Log.printLine("VM.UID: " + vm.getUid());
-		return vm;
+//		Log.printLine("vm.getId(): " + vmId);
+		return vmId;
 	}
 
 }
